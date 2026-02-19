@@ -13,8 +13,7 @@ const PLAYER_COLORS: Array[Color] = [
 ]
 
 @onready var board_container: Control = $VBoxContainer/BoardContainer
-@onready var menu_button: Button = $VBoxContainer/TopBar/MenuButton
-@onready var new_game_button: Button = $VBoxContainer/TopBar/NewGameButton
+@onready var tracker_menu_overlay: Control = $TrackerMenuOverlay
 
 var store: RefCounted = PERSISTENCE_STORE_SCRIPT.new()
 var session_service: RefCounted = null
@@ -24,8 +23,8 @@ var on_open_main_menu: Callable = Callable()
 var on_open_game_config: Callable = Callable()
 
 func _ready() -> void:
-	menu_button.pressed.connect(_on_menu_pressed)
-	new_game_button.pressed.connect(_on_new_game_pressed)
+	tracker_menu_overlay.connect("main_menu_requested", Callable(self, "_on_menu_pressed"))
+	tracker_menu_overlay.connect("new_game_requested", Callable(self, "_on_new_game_pressed"))
 
 	if session_service == null:
 		session_service = _create_session_service(store)

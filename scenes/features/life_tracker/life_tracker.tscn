@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/features/life_tracker/life_tracker_screen.gd" id="1_tracker"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/tracker_menu_overlay.tscn" id="2_menu_overlay"]
 
 [node name="LifeTracker" type="Control"]
 layout_mode = 3
@@ -18,23 +19,9 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme_override_constants/separation = 12
-
-[node name="TopBar" type="HBoxContainer" parent="VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 10
-alignment = 1
-
-[node name="MenuButton" type="Button" parent="VBoxContainer/TopBar"]
-custom_minimum_size = Vector2(160, 44)
-layout_mode = 2
-text = "Main Menu"
-
-[node name="NewGameButton" type="Button" parent="VBoxContainer/TopBar"]
-custom_minimum_size = Vector2(160, 44)
-layout_mode = 2
-text = "New Game"
 
 [node name="BoardContainer" type="Control" parent="VBoxContainer"]
 layout_mode = 2
 size_flags_vertical = 3
+
+[node name="TrackerMenuOverlay" parent="." instance=ExtResource("2_menu_overlay")]

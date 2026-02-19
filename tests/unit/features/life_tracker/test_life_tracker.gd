@@ -185,3 +185,44 @@ func test_removing_commander_damage_restores_life_by_same_amount() -> void:
 	assert_eq(damage_label.text, "1")
 	assert_eq(life_label.text, "39")
 
+func test_menu_starts_closed_and_button_visible() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var fake_store: FakeStore = FakeStore.new(state)
+
+	var scene: PackedScene = load("res://scenes/features/life_tracker/life_tracker.tscn")
+	var tracker: Control = scene.instantiate()
+	var service_script: GDScript = load("res://scripts/domain/game_session_service.gd")
+	tracker.store = fake_store
+	tracker.session_service = service_script.new(fake_store)
+	add_child_autofree(tracker)
+
+	var menu_panel: Control = tracker.get_node("TrackerMenuOverlay/MenuPanel")
+	var menu_button: Button = tracker.get_node("TrackerMenuOverlay/MenuButton")
+	var input_blocker: Control = tracker.get_node("TrackerMenuOverlay/InputBlocker")
+	assert_false(menu_panel.visible)
+	assert_true(menu_button.visible)
+	assert_eq(input_blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
+
+func test_menu_button_toggles_panel_and_input_blocker() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var fake_store: FakeStore = FakeStore.new(state)
+
+	var scene: PackedScene = load("res://scenes/features/life_tracker/life_tracker.tscn")
+	var tracker: Control = scene.instantiate()
+	var service_script: GDScript = load("res://scripts/domain/game_session_service.gd")
+	tracker.store = fake_store
+	tracker.session_service = service_script.new(fake_store)
+	add_child_autofree(tracker)
+
+	var menu_panel: Control = tracker.get_node("TrackerMenuOverlay/MenuPanel")
+	var menu_button: Button = tracker.get_node("TrackerMenuOverlay/MenuButton")
+	var input_blocker: Control = tracker.get_node("TrackerMenuOverlay/InputBlocker")
+
+	menu_button.pressed.emit()
+	assert_true(menu_panel.visible)
+	assert_eq(input_blocker.mouse_filter, Control.MOUSE_FILTER_STOP)
+
+	menu_button.pressed.emit()
+	assert_false(menu_panel.visible)
+	assert_eq(input_blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
+
