@@ -1,4 +1,4 @@
-extends RefCounted
+extends "res://scripts/contracts/game_store.gd"
 class_name PersistenceStore
 
 const ACTIVE_SAVE_PATH := "user://active_game.save"

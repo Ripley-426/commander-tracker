@@ -6,7 +6,7 @@ extends Control
 @onready var start_button: Button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonsRow/StartButton
 @onready var back_button: Button = $CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonsRow/BackButton
 
-var store: Object = PersistenceStore.new()
+var store: RefCounted = PersistenceStore.new()
 var current_layouts: Array[Dictionary] = []
 var on_open_life_tracker: Callable = Callable()
 var on_open_main_menu: Callable = Callable()

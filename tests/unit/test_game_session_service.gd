@@ -1,6 +1,6 @@
 extends GutTest
 
-class FakeStore extends RefCounted:
+class FakeStore extends "res://scripts/contracts/game_store.gd":
 	var has_game: bool = false
 	var load_state: Dictionary = {}
 	var save_calls: int = 0

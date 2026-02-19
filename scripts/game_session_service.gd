@@ -1,9 +1,9 @@
-extends RefCounted
+extends "res://scripts/contracts/game_session.gd"
 class_name GameSessionService
 
-var store: Object
+var store: RefCounted
 
-func _init(p_store: Object = null) -> void:
+func _init(p_store: RefCounted = null) -> void:
 	store = p_store if p_store != null else PersistenceStore.new()
 
 func has_active_game() -> bool:

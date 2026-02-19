@@ -4,7 +4,7 @@ extends Control
 @onready var new_game_button: Button = $CenterContainer/VBoxContainer/NewGameButton
 @onready var exit_button: Button = $CenterContainer/VBoxContainer/ExitButton
 
-var store: Object = PersistenceStore.new()
+var store: RefCounted = PersistenceStore.new()
 var on_open_life_tracker: Callable = Callable()
 var on_open_game_config: Callable = Callable()
 

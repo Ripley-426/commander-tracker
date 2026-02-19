@@ -19,33 +19,8 @@ static func _to_int(value: Variant) -> int:
 	return 0
 
 static func get_layout_presets(player_count: int) -> Array[Dictionary]:
-	match player_count:
-		2:
-			return [
-				{"id": "p2_head_to_head", "name": "Head-to-Head"}
-			]
-		3:
-			return [
-				{"id": "p3_side_left", "name": "Two Opposed + Side Left"},
-				{"id": "p3_side_right", "name": "Two Opposed + Side Right"}
-			]
-		4:
-			return [
-				{"id": "p4_two_facing_two", "name": "Two Facing Two"},
-				{"id": "p4_side_seats", "name": "Opposed + Two Side Seats"}
-			]
-		5:
-			return [
-				{"id": "p5_side_bias_left", "name": "Opposed Core + Side Bias Left"},
-				{"id": "p5_side_bias_right", "name": "Opposed Core + Side Bias Right"}
-			]
-		6:
-			return [
-				{"id": "p6_three_vs_three", "name": "Three Facing Three"},
-				{"id": "p6_two_vs_two_sides", "name": "Two Facing Two + Side Seats"}
-			]
-		_:
-			return []
+	var registry_script: GDScript = load("res://scripts/layout_registry.gd")
+	return registry_script.get_layout_presets(player_count)
 
 static func create_new_game(player_count: int, starting_life: int, layout_id: String) -> Dictionary:
 	var now := Time.get_unix_time_from_system()

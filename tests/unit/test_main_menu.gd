@@ -1,6 +1,6 @@
 extends GutTest
 
-class FakeStore extends RefCounted:
+class FakeStore extends "res://scripts/contracts/game_store.gd":
 	var has_game: bool = false
 
 	func _init(p_has_game: bool = false) -> void:
