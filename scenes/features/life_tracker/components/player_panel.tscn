@@ -1,0 +1,109 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/player_panel.gd" id="1_panel"]
+
+[node name="PlayerPanel" type="Panel"]
+custom_minimum_size = Vector2(220, 180)
+mouse_filter = 2
+script = ExtResource("1_panel")
+
+[node name="MiddleArea" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_top = 0.25
+anchor_right = 1.0
+anchor_bottom = 0.75
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+
+[node name="NameLabel" type="Label" parent="MiddleArea"]
+layout_mode = 1
+anchors_preset = 10
+anchor_top = 0.04
+anchor_right = 1.0
+anchor_bottom = 0.24
+grow_horizontal = 2
+mouse_filter = 2
+horizontal_alignment = 1
+text = "Player"
+
+[node name="LifeLabel" type="Label" parent="MiddleArea"]
+layout_mode = 1
+anchors_preset = 15
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "40"
+
+[node name="DeltaLabel" type="Label" parent="MiddleArea"]
+visible = false
+layout_mode = 1
+anchors_preset = 10
+anchor_top = 0.82
+anchor_right = 1.0
+anchor_bottom = 0.98
+offset_top = -2.0
+offset_bottom = -4.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.95)
+theme_override_colors/font_shadow_color = Color(0, 0, 0, 0.65)
+theme_override_constants/shadow_offset_x = 1
+theme_override_constants/shadow_offset_y = 2
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "+0"
+
+[node name="HitZones" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 0
+
+[node name="TopHitButton" type="Button" parent="HitZones"]
+layout_mode = 2
+size_flags_vertical = 3
+text = ""
+focus_mode = 0
+
+[node name="BottomHitButton" type="Button" parent="HitZones"]
+layout_mode = 2
+size_flags_vertical = 3
+text = ""
+focus_mode = 0
+
+[node name="CommanderDamageContainer" type="MarginContainer" parent="."]
+layout_mode = 0
+anchors_preset = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.0
+anchor_bottom = 0.0
+offset_left = 0.0
+offset_top = 0.0
+offset_right = 0.0
+offset_bottom = 0.0
+mouse_filter = 2
+theme_override_constants/margin_left = 8
+theme_override_constants/margin_top = 8
+theme_override_constants/margin_right = 4
+theme_override_constants/margin_bottom = 4
+
+[node name="CommanderDamageList" type="VBoxContainer" parent="CommanderDamageContainer"]
+layout_mode = 2
+mouse_filter = 2
+size_flags_horizontal = 0
+size_flags_vertical = 0
+theme_override_constants/separation = 12
+
+[node name="DeltaResetTimer" type="Timer" parent="."]
+wait_time = 5.0
+one_shot = true
