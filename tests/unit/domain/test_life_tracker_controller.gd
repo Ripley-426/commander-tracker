@@ -28,14 +28,23 @@ class FakeSession extends "res://scripts/contracts/game_session.gd":
 		next_state["players"] = players
 		return true
 
-func test_apply_life_delta_commits_through_session() -> void:
+func _create_controller(session: FakeSession) -> RefCounted:
+	return LIFE_TRACKER_CONTROLLER_SCRIPT.new(session)
+
+func test_apply_life_delta_saves_through_session() -> void:
 	var initial_state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
 	var session: FakeSession = FakeSession.new(initial_state)
-	var controller: RefCounted = LIFE_TRACKER_CONTROLLER_SCRIPT.new(session)
+	var controller: RefCounted = _create_controller(session)
+	controller.load_state()
+	controller.apply_life_delta(0, 2)
+	assert_eq(session.save_calls, 1)
 
+func test_apply_life_delta_updates_controller_state() -> void:
+	var initial_state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var session: FakeSession = FakeSession.new(initial_state)
+	var controller: RefCounted = _create_controller(session)
 	controller.load_state()
 	assert_true(controller.apply_life_delta(0, 2))
-	assert_eq(session.save_calls, 1)
 
 	var players: Array = controller.get_state().get("players", [])
 	var player: Dictionary = players[0]
@@ -43,6 +52,5 @@ func test_apply_life_delta_commits_through_session() -> void:
 
 func test_commit_state_returns_false_when_empty() -> void:
 	var session: FakeSession = FakeSession.new({})
-	var controller: RefCounted = LIFE_TRACKER_CONTROLLER_SCRIPT.new(session)
+	var controller: RefCounted = _create_controller(session)
 	assert_false(controller.commit_state())
-

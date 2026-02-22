@@ -19,6 +19,8 @@ var store: RefCounted = PERSISTENCE_STORE_SCRIPT.new()
 var session_service: RefCounted = null
 var controller: RefCounted = null
 var game_state: Dictionary = {}
+var dead_player_indices: Dictionary = {}
+var revived_at_lethal_damage_indices: Dictionary = {}
 var on_open_main_menu: Callable = Callable()
 var on_open_game_config: Callable = Callable()
 
@@ -45,6 +47,7 @@ func _notification(what: int) -> void:
 		_commit_state()
 
 func _render_state() -> void:
+	_sync_dead_players_from_commander_damage()
 	_clear_children(board_container)
 
 	var players: Array = game_state.get("players", [])
@@ -61,6 +64,7 @@ func _render_state() -> void:
 		var slot: Dictionary = slots[i] if i < slots.size() else {"x": 0.05, "y": 0.05, "w": 0.40, "h": 0.40}
 		var should_rotate: bool = i < 2
 		var commander_rows: Array[Dictionary] = PLAYER_STATE_QUERIES.build_commander_rows_for_target(game_state, i, PLAYER_COLORS)
+		commander_rows = _filter_commander_rows_for_alive_sources(commander_rows)
 		_add_player_panel(i, player_name, life, panel_color, slot, should_rotate, commander_rows)
 
 func _add_player_panel(player_index: int, player_name: String, life: int, panel_color: Color, slot: Dictionary, should_rotate: bool, commander_rows: Array[Dictionary]) -> void:
@@ -79,6 +83,9 @@ func _add_player_panel(player_index: int, player_name: String, life: int, panel_
 	panel.setup(player_index, player_name, life, panel_color, should_rotate, commander_rows)
 	panel.life_delta_requested.connect(_on_life_delta_pressed)
 	panel.commander_delta_requested.connect(_on_commander_delta_pressed)
+	panel.dead_state_changed.connect(_on_player_dead_state_changed)
+	if dead_player_indices.has(str(player_index)):
+		panel.call("set_dead", true, false)
 
 func _on_life_delta_pressed(player_index: int, delta: int) -> void:
 	var changed: bool = controller.apply_life_delta(player_index, delta)
@@ -113,6 +120,8 @@ func _on_commander_delta_pressed(target_player_index: int, source_player_index: 
 	var life_delta: int = next_life - previous_life
 	_refresh_player_commander_damage(target_player_index, source_player_index)
 	_refresh_player_life(target_player_index)
+	if not _player_has_lethal_commander_damage(target_player_index):
+		revived_at_lethal_damage_indices.erase(str(target_player_index))
 	if life_delta != 0:
 		_add_panel_life_feedback(target_player_index, life_delta)
 
@@ -126,6 +135,22 @@ func _refresh_player_commander_damage(target_player_index: int, source_player_in
 
 	var damage: int = PLAYER_STATE_QUERIES.get_commander_damage(game_state, source_player_index, target_player_index)
 	panel_node.call("set_commander_damage", source_player_index, max(damage, 0))
+	if damage >= 21:
+		panel_node.call("set_dead", true)
+
+func _on_player_dead_state_changed(player_index: int, is_dead: bool) -> void:
+	var key: String = str(player_index)
+	if is_dead:
+		revived_at_lethal_damage_indices.erase(key)
+		dead_player_indices[key] = true
+		_render_state()
+		return
+	dead_player_indices.erase(key)
+	if _player_has_lethal_commander_damage(player_index):
+		revived_at_lethal_damage_indices[key] = true
+	else:
+		revived_at_lethal_damage_indices.erase(key)
+	_render_state()
 
 func _add_panel_life_feedback(player_index: int, delta: int) -> void:
 	if player_index < 0 or player_index >= board_container.get_child_count():
@@ -149,7 +174,8 @@ func _on_new_game_pressed() -> void:
 	_open_game_config()
 
 func _clear_children(node: Node) -> void:
-	for child in node.get_children():
+	for child: Node in node.get_children():
+		node.remove_child(child)
 		child.queue_free()
 
 func _open_main_menu() -> void:
@@ -175,3 +201,55 @@ func _create_controller(p_session: RefCounted) -> RefCounted:
 func _get_layout_slots(layout_id: String, player_count: int) -> Array[Dictionary]:
 	var layout_script: GDScript = load("res://scripts/domain/player_layout_service.gd")
 	return layout_script.get_slots(layout_id, player_count)
+
+func _filter_commander_rows_for_alive_sources(rows: Array[Dictionary]) -> Array[Dictionary]:
+	var filtered_rows: Array[Dictionary] = []
+	for row: Dictionary in rows:
+		var source_index: int = int(row.get("source_index", -1))
+		if dead_player_indices.has(str(source_index)):
+			continue
+		filtered_rows.append(row)
+	return filtered_rows
+
+func _sync_dead_players_from_commander_damage() -> void:
+	var players: Array = game_state.get("players", [])
+	var detected_dead_by_damage: Dictionary = {}
+	for i: int in range(players.size()):
+		var player_value: Variant = players[i]
+		if typeof(player_value) != TYPE_DICTIONARY:
+			continue
+		var player_key: String = str(i)
+		if revived_at_lethal_damage_indices.has(player_key):
+			continue
+		var player: Dictionary = player_value
+		var damage_value: Variant = player.get("commander_damage", {})
+		if typeof(damage_value) != TYPE_DICTIONARY:
+			continue
+		var damage_map: Dictionary = damage_value
+		for damage_value_entry: Variant in damage_map.values():
+			var damage: int = int(damage_value_entry)
+			if damage >= 21:
+				detected_dead_by_damage[str(i)] = true
+				break
+
+	for dead_key: String in detected_dead_by_damage.keys():
+		if dead_player_indices.has(dead_key):
+			continue
+		dead_player_indices[dead_key] = true
+
+func _player_has_lethal_commander_damage(player_index: int) -> bool:
+	var players: Array = game_state.get("players", [])
+	if player_index < 0 or player_index >= players.size():
+		return false
+	var player_value: Variant = players[player_index]
+	if typeof(player_value) != TYPE_DICTIONARY:
+		return false
+	var player: Dictionary = player_value
+	var damage_value: Variant = player.get("commander_damage", {})
+	if typeof(damage_value) != TYPE_DICTIONARY:
+		return false
+	var damage_map: Dictionary = damage_value
+	for damage_value_entry: Variant in damage_map.values():
+		if int(damage_value_entry) >= 21:
+			return true
+	return false

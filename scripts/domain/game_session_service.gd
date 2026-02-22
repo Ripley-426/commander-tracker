@@ -67,8 +67,48 @@ func apply_commander_delta(state: Dictionary, source_index: int, target_index: i
 	var damage: Dictionary = damage_value
 
 	var next: int = int(damage.get(source_id, 0)) + delta
-	damage[source_id] = max(next, 0)
+	damage[source_id] = clampi(next, 0, 21)
 	target["commander_damage"] = damage
 	players[target_index] = target
+	state["players"] = players
+	return true
+
+func clear_commander_damage_from_source(state: Dictionary, source_index: int) -> bool:
+	var players_value: Variant = state.get("players", [])
+	if typeof(players_value) != TYPE_ARRAY:
+		return false
+	var players: Array = players_value
+
+	if source_index < 0 or source_index >= players.size():
+		return false
+
+	var source_value: Variant = players[source_index]
+	if typeof(source_value) != TYPE_DICTIONARY:
+		return false
+	var source: Dictionary = source_value
+	var source_id: String = str(source.get("id", ""))
+	if source_id == "":
+		return false
+
+	var changed: bool = false
+	for i: int in range(players.size()):
+		var player_value: Variant = players[i]
+		if typeof(player_value) != TYPE_DICTIONARY:
+			continue
+		var player: Dictionary = player_value
+		var damage_value: Variant = player.get("commander_damage", {})
+		if typeof(damage_value) != TYPE_DICTIONARY:
+			continue
+		var damage: Dictionary = damage_value
+		if not damage.has(source_id):
+			continue
+		damage.erase(source_id)
+		player["commander_damage"] = damage
+		players[i] = player
+		changed = true
+
+	if not changed:
+		return false
+
 	state["players"] = players
 	return true

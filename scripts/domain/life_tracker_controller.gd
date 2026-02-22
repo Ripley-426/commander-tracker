@@ -41,6 +41,12 @@ func apply_commander_delta_with_life_loss(source_index: int, target_index: int, 
 	commit_state()
 	return true
 
+func clear_commander_damage_from_source(source_index: int) -> bool:
+	var changed: bool = session.clear_commander_damage_from_source(game_state, source_index)
+	if changed:
+		commit_state()
+	return changed
+
 func _get_commander_damage(source_index: int, target_index: int) -> int:
 	return PLAYER_STATE_QUERIES.get_commander_damage(game_state, source_index, target_index)
 

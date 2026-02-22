@@ -13,53 +13,86 @@ func before_each() -> void:
 	main_menu_requests = 0
 	new_game_requests = 0
 
-func test_menu_starts_closed() -> void:
+func _create_overlay() -> Control:
 	var scene: PackedScene = load("res://scenes/features/life_tracker/components/tracker_menu_overlay.tscn")
 	var overlay: Control = scene.instantiate()
 	add_child_autofree(overlay)
+	return overlay
 
+func test_menu_starts_closed() -> void:
+	var overlay: Control = _create_overlay()
 	var menu_panel: Control = overlay.get_node("MenuPanel")
-	var blocker: Control = overlay.get_node("InputBlocker")
 	assert_false(menu_panel.visible)
+
+func test_menu_starts_with_input_blocker_ignoring_input() -> void:
+	var overlay: Control = _create_overlay()
+	var blocker: Control = overlay.get_node("InputBlocker")
 	assert_eq(blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
-func test_toggle_button_opens_and_closes_menu() -> void:
-	var scene: PackedScene = load("res://scenes/features/life_tracker/components/tracker_menu_overlay.tscn")
-	var overlay: Control = scene.instantiate()
-	add_child_autofree(overlay)
-
+func test_toggle_button_opens_menu() -> void:
+	var overlay: Control = _create_overlay()
 	var menu_button: Button = overlay.get_node("MenuButton")
 	var menu_panel: Control = overlay.get_node("MenuPanel")
-	var blocker: Control = overlay.get_node("InputBlocker")
-
 	menu_button.pressed.emit()
 	assert_true(menu_panel.visible)
+
+func test_toggle_button_sets_input_blocker_to_stop_when_open() -> void:
+	var overlay: Control = _create_overlay()
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var blocker: Control = overlay.get_node("InputBlocker")
+	menu_button.pressed.emit()
 	assert_eq(blocker.mouse_filter, Control.MOUSE_FILTER_STOP)
 
+func test_toggle_button_closes_menu_when_pressed_twice() -> void:
+	var overlay: Control = _create_overlay()
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var menu_panel: Control = overlay.get_node("MenuPanel")
+	menu_button.pressed.emit()
 	menu_button.pressed.emit()
 	assert_false(menu_panel.visible)
+
+func test_toggle_button_sets_input_blocker_to_ignore_when_closed() -> void:
+	var overlay: Control = _create_overlay()
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var blocker: Control = overlay.get_node("InputBlocker")
+	menu_button.pressed.emit()
+	menu_button.pressed.emit()
 	assert_eq(blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
-func test_action_buttons_emit_signals_and_close_menu() -> void:
-	var scene: PackedScene = load("res://scenes/features/life_tracker/components/tracker_menu_overlay.tscn")
-	var overlay: Control = scene.instantiate()
-	add_child_autofree(overlay)
+func test_main_menu_action_emits_main_menu_signal() -> void:
+	var overlay: Control = _create_overlay()
 	overlay.connect("main_menu_requested", Callable(self, "_on_main_menu_requested"))
-	overlay.connect("new_game_requested", Callable(self, "_on_new_game_requested"))
 
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var main_menu_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/MainMenuActionButton")
+	menu_button.pressed.emit()
+	main_menu_action_button.pressed.emit()
+	assert_eq(main_menu_requests, 1)
+
+func test_main_menu_action_closes_menu() -> void:
+	var overlay: Control = _create_overlay()
 	var menu_button: Button = overlay.get_node("MenuButton")
 	var menu_panel: Control = overlay.get_node("MenuPanel")
 	var main_menu_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/MainMenuActionButton")
-	var new_game_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/NewGameActionButton")
-
 	menu_button.pressed.emit()
-	assert_true(menu_panel.visible)
 	main_menu_action_button.pressed.emit()
-	assert_eq(main_menu_requests, 1)
 	assert_false(menu_panel.visible)
 
+func test_new_game_action_emits_new_game_signal() -> void:
+	var overlay: Control = _create_overlay()
+	overlay.connect("new_game_requested", Callable(self, "_on_new_game_requested"))
+
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var new_game_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/NewGameActionButton")
 	menu_button.pressed.emit()
-	assert_true(menu_panel.visible)
 	new_game_action_button.pressed.emit()
 	assert_eq(new_game_requests, 1)
+
+func test_new_game_action_closes_menu() -> void:
+	var overlay: Control = _create_overlay()
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var menu_panel: Control = overlay.get_node("MenuPanel")
+	var new_game_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/NewGameActionButton")
+	menu_button.pressed.emit()
+	new_game_action_button.pressed.emit()
 	assert_false(menu_panel.visible)

@@ -9,8 +9,8 @@ signal delta_requested(source_player_index: int, delta: int)
 var source_player_index: int = -1
 
 func _ready() -> void:
-	minus_button.pressed.connect(_on_minus_pressed)
-	plus_button.pressed.connect(_on_plus_pressed)
+	minus_button.connect("delta_requested", Callable(self, "_on_minus_delta_requested"))
+	plus_button.connect("delta_requested", Callable(self, "_on_plus_delta_requested"))
 
 func setup(p_source_player_index: int, damage: int, source_color: Color) -> void:
 	source_player_index = p_source_player_index
@@ -22,11 +22,15 @@ func setup(p_source_player_index: int, damage: int, source_color: Color) -> void
 func set_damage(damage: int) -> void:
 	damage_label.text = str(max(damage, 0))
 
-func _on_plus_pressed() -> void:
-	delta_requested.emit(source_player_index, 1)
+func set_interactable(enabled: bool) -> void:
+	minus_button.call("set_interactable", enabled)
+	plus_button.call("set_interactable", enabled)
 
-func _on_minus_pressed() -> void:
-	delta_requested.emit(source_player_index, -1)
+func _on_plus_delta_requested(delta: int) -> void:
+	delta_requested.emit(source_player_index, delta)
+
+func _on_minus_delta_requested(delta: int) -> void:
+	delta_requested.emit(source_player_index, delta)
 
 func _apply_button_style(button: Button, button_color: Color) -> void:
 	var normal_style: StyleBoxFlat = StyleBoxFlat.new()

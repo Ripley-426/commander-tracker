@@ -18,39 +18,70 @@ func _mark_tracker_open() -> void:
 func before_each() -> void:
 	did_open_tracker = false
 
-func test_refresh_layouts_updates_options_for_player_count() -> void:
+func _create_config() -> Control:
 	var scene: PackedScene = load("res://scenes/features/game_config/game_config.tscn")
 	var config: Control = scene.instantiate()
 	add_child_autofree(config)
+	return config
 
+func test_refresh_layouts_updates_options_for_player_count() -> void:
+	var config: Control = _create_config()
 	var player_count: SpinBox = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayerCountSpinBox")
 	var layout_options: OptionButton = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/LayoutOptionButton")
 
 	player_count.value = 2
 	config._on_player_count_changed(player_count.value)
-
 	assert_eq(layout_options.item_count, 1)
+
+func test_refresh_layouts_sets_expected_layout_label_for_two_players() -> void:
+	var config: Control = _create_config()
+	var player_count: SpinBox = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayerCountSpinBox")
+	var layout_options: OptionButton = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/LayoutOptionButton")
+
+	player_count.value = 2
+	config._on_player_count_changed(player_count.value)
 	assert_eq(layout_options.get_item_text(0), "Head-to-Head")
 
-func test_start_pressed_saves_and_uses_navigation_callback() -> void:
-	var scene: PackedScene = load("res://scenes/features/game_config/game_config.tscn")
-	var config: Control = scene.instantiate()
-	add_child_autofree(config)
-
+func test_start_pressed_saves_state() -> void:
+	var config: Control = _create_config()
 	var fake_store: FakeStore = FakeStore.new()
 	config.store = fake_store
-	config.on_open_life_tracker = Callable(self, "_mark_tracker_open")
 
 	var player_count: SpinBox = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayerCountSpinBox")
 	var starting_life: SpinBox = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/StartingLifeSpinBox")
-
 	player_count.value = 3
 	starting_life.value = 42
 	config._on_player_count_changed(player_count.value)
 	config._on_start_pressed()
 
 	assert_true(fake_store.save_called)
-	assert_true(did_open_tracker)
-	assert_eq(fake_store.last_saved_state["settings"]["player_count"], 3)
-	assert_eq(fake_store.last_saved_state["settings"]["starting_life"], 42)
 
+func test_start_pressed_navigates_to_tracker_on_successful_save() -> void:
+	var config: Control = _create_config()
+	var fake_store: FakeStore = FakeStore.new()
+	config.store = fake_store
+	config.on_open_life_tracker = Callable(self, "_mark_tracker_open")
+
+	config._on_start_pressed()
+	assert_true(did_open_tracker)
+
+func test_start_pressed_saves_selected_player_count() -> void:
+	var config: Control = _create_config()
+	var fake_store: FakeStore = FakeStore.new()
+	config.store = fake_store
+	var player_count: SpinBox = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/PlayerCountSpinBox")
+	player_count.value = 3
+	config._on_player_count_changed(player_count.value)
+	config._on_start_pressed()
+
+	assert_eq(fake_store.last_saved_state["settings"]["player_count"], 3)
+
+func test_start_pressed_saves_selected_starting_life() -> void:
+	var config: Control = _create_config()
+	var fake_store: FakeStore = FakeStore.new()
+	config.store = fake_store
+	var starting_life: SpinBox = config.get_node("CenterContainer/PanelContainer/MarginContainer/VBoxContainer/StartingLifeSpinBox")
+	starting_life.value = 42
+	config._on_start_pressed()
+
+	assert_eq(fake_store.last_saved_state["settings"]["starting_life"], 42)

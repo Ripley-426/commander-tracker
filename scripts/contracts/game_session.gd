@@ -24,3 +24,7 @@ func apply_life_delta(_state: Dictionary, _player_index: int, _delta: int) -> bo
 func apply_commander_delta(_state: Dictionary, _source_index: int, _target_index: int, _delta: int) -> bool:
 	push_error("GameSession.apply_commander_delta not implemented.")
 	return false
+
+func clear_commander_damage_from_source(_state: Dictionary, _source_index: int) -> bool:
+	push_error("GameSession.clear_commander_damage_from_source not implemented.")
+	return false

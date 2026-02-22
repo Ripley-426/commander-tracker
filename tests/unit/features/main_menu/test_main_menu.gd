@@ -9,27 +9,40 @@ class FakeStore extends "res://scripts/contracts/game_store.gd":
 	func has_active_game() -> bool:
 		return has_game
 
-func test_refresh_buttons_hides_continue_without_active_game() -> void:
+func _create_menu() -> Control:
 	var scene: PackedScene = load("res://scenes/features/main_menu/main_menu.tscn")
 	var menu: Control = scene.instantiate()
 	add_child_autofree(menu)
+	return menu
 
+func test_refresh_buttons_hides_continue_without_active_game() -> void:
+	var menu: Control = _create_menu()
 	menu.store = FakeStore.new(false)
 	menu._refresh_buttons()
 
 	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
 	assert_false(continue_button.visible)
+
+func test_refresh_buttons_disables_continue_without_active_game() -> void:
+	var menu: Control = _create_menu()
+	menu.store = FakeStore.new(false)
+	menu._refresh_buttons()
+
+	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
 	assert_true(continue_button.disabled)
 
 func test_refresh_buttons_shows_continue_with_active_game() -> void:
-	var scene: PackedScene = load("res://scenes/features/main_menu/main_menu.tscn")
-	var menu: Control = scene.instantiate()
-	add_child_autofree(menu)
-
+	var menu: Control = _create_menu()
 	menu.store = FakeStore.new(true)
 	menu._refresh_buttons()
 
 	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
 	assert_true(continue_button.visible)
-	assert_false(continue_button.disabled)
 
+func test_refresh_buttons_enables_continue_with_active_game() -> void:
+	var menu: Control = _create_menu()
+	menu.store = FakeStore.new(true)
+	menu._refresh_buttons()
+
+	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
+	assert_false(continue_button.disabled)
