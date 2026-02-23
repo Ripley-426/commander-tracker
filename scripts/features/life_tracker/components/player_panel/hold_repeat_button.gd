@@ -1,5 +1,4 @@
 extends Button
-class_name HoldRepeatButton
 
 signal delta_requested(delta: int)
 

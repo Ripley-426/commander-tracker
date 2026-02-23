@@ -1,0 +1,82 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/dice_roll/starter_roll_overlay.gd" id="1_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/dice_roll/starter_roll_history_panel.tscn" id="2_history_panel"]
+
+[node name="StarterRollOverlay" type="Control"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+z_index = 90
+script = ExtResource("1_overlay")
+
+[node name="DimLayer" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.03, 0.04, 0.06, 0.86)
+mouse_filter = 0
+
+[node name="MainPanel" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -525.0
+offset_top = -212.0
+offset_right = 525.0
+offset_bottom = 275.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 0
+
+[node name="PanelMargin" type="MarginContainer" parent="MainPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 20
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 20
+
+[node name="MainContent" type="VBoxContainer" parent="MainPanel/PanelMargin"]
+layout_mode = 2
+theme_override_constants/separation = 18
+
+[node name="StatusLabel" type="Label" parent="MainPanel/PanelMargin/MainContent"]
+custom_minimum_size = Vector2(0, 48)
+layout_mode = 2
+theme_override_font_sizes/font_size = 34
+horizontal_alignment = 1
+vertical_alignment = 1
+text = "Rolling..."
+
+[node name="CenterDiceContainer" type="HBoxContainer" parent="MainPanel/PanelMargin/MainContent"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 26
+
+[node name="HintLabel" type="Label" parent="MainPanel/PanelMargin/MainContent"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 0.72)
+theme_override_font_sizes/font_size = 25
+horizontal_alignment = 1
+text = "Tap to dismiss after winner is decided"
+
+[node name="HistoryPanel" parent="." instance=ExtResource("2_history_panel")]
+
+[node name="RoundDelayTimer" type="Timer" parent="."]
+wait_time = 0.9
+one_shot = true
+
+[node name="RollTickTimer" type="Timer" parent="."]
+wait_time = 0.08
+one_shot = false

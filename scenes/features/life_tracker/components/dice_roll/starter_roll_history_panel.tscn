@@ -1,0 +1,35 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/dice_roll/starter_roll_history_panel.gd" id="1_history"]
+
+[node name="StarterRollHistoryPanel" type="PanelContainer"]
+visible = false
+custom_minimum_size = Vector2(330, 0)
+layout_mode = 1
+anchors_preset = 0
+offset_left = 14.0
+offset_top = 14.0
+offset_right = 497.0
+offset_bottom = 272.0
+mouse_filter = 2
+script = ExtResource("1_history")
+
+[node name="HistoryMargin" type="MarginContainer" parent="."]
+layout_mode = 2
+theme_override_constants/margin_left = 12
+theme_override_constants/margin_top = 12
+theme_override_constants/margin_right = 12
+theme_override_constants/margin_bottom = 12
+
+[node name="HistoryContent" type="VBoxContainer" parent="HistoryMargin"]
+layout_mode = 2
+theme_override_constants/separation = 9
+
+[node name="HistoryLabel" type="Label" parent="HistoryMargin/HistoryContent"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 21
+text = "Last Tie"
+
+[node name="HistoryDiceContainer" type="HBoxContainer" parent="HistoryMargin/HistoryContent"]
+layout_mode = 2
+theme_override_constants/separation = 9

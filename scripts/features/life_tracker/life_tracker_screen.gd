@@ -1,6 +1,6 @@
 extends Control
 
-const PLAYER_PANEL_SCENE: PackedScene = preload("res://scenes/features/life_tracker/components/player_panel.tscn")
+const PLAYER_PANEL_SCENE: PackedScene = preload("res://scenes/features/life_tracker/components/player_panel/player_panel.tscn")
 const PLAYER_STATE_QUERIES: GDScript = preload("res://scripts/domain/player_state_queries.gd")
 const PERSISTENCE_STORE_SCRIPT: GDScript = preload("res://scripts/data/persistence_store.gd")
 const PLAYER_COLORS: Array[Color] = [
@@ -14,6 +14,7 @@ const PLAYER_COLORS: Array[Color] = [
 
 @onready var board_container: Control = $VBoxContainer/BoardContainer
 @onready var tracker_menu_overlay: Control = $TrackerMenuOverlay
+@onready var starter_roll_overlay: Control = $StarterRollOverlay
 
 var store: RefCounted = PERSISTENCE_STORE_SCRIPT.new()
 var session_service: RefCounted = null
@@ -21,12 +22,15 @@ var controller: RefCounted = null
 var game_state: Dictionary = {}
 var dead_player_indices: Dictionary = {}
 var revived_at_lethal_damage_indices: Dictionary = {}
+var starting_player_index: int = -1
 var on_open_main_menu: Callable = Callable()
 var on_open_game_config: Callable = Callable()
 
 func _ready() -> void:
 	tracker_menu_overlay.connect("main_menu_requested", Callable(self, "_on_menu_pressed"))
 	tracker_menu_overlay.connect("new_game_requested", Callable(self, "_on_new_game_pressed"))
+	tracker_menu_overlay.connect("starter_roll_requested", Callable(self, "_on_starter_roll_requested"))
+	starter_roll_overlay.connect("winner_decided", Callable(self, "_on_starter_roll_winner_decided"))
 
 	if session_service == null:
 		session_service = _create_session_service(store)
@@ -59,6 +63,8 @@ func _render_state() -> void:
 	for i: int in range(players.size()):
 		var player: Dictionary = players[i]
 		var player_name: String = str(player.get("name", "Player"))
+		if i == starting_player_index:
+			player_name = "%s \u2655" % player_name
 		var life: int = int(player.get("life", 0))
 		var panel_color: Color = PLAYER_COLORS[i % PLAYER_COLORS.size()]
 		var slot: Dictionary = slots[i] if i < slots.size() else {"x": 0.05, "y": 0.05, "w": 0.40, "h": 0.40}
@@ -173,6 +179,16 @@ func _on_new_game_pressed() -> void:
 	_commit_state()
 	_open_game_config()
 
+func _on_starter_roll_requested() -> void:
+	var roll_players: Array[Dictionary] = _build_starter_roll_players()
+	if roll_players.size() <= 0:
+		return
+	starter_roll_overlay.call("start_roll_for_players", roll_players)
+
+func _on_starter_roll_winner_decided(player_index: int) -> void:
+	starting_player_index = player_index
+	_render_state()
+
 func _clear_children(node: Node) -> void:
 	for child: Node in node.get_children():
 		node.remove_child(child)
@@ -253,3 +269,20 @@ func _player_has_lethal_commander_damage(player_index: int) -> bool:
 		if int(damage_value_entry) >= 21:
 			return true
 	return false
+
+func _build_starter_roll_players() -> Array[Dictionary]:
+	var players: Array = game_state.get("players", [])
+	var roll_players: Array[Dictionary] = []
+	for i: int in range(players.size()):
+		if dead_player_indices.has(str(i)):
+			continue
+		var player_value: Variant = players[i]
+		if typeof(player_value) != TYPE_DICTIONARY:
+			continue
+		var player: Dictionary = player_value
+		roll_players.append({
+			"player_index": i,
+			"player_name": str(player.get("name", "Player %d" % (i + 1))),
+			"player_color": PLAYER_COLORS[i % PLAYER_COLORS.size()]
+		})
+	return roll_players

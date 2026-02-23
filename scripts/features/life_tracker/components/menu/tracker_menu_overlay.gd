@@ -2,6 +2,7 @@ extends Control
 
 signal main_menu_requested()
 signal new_game_requested()
+signal starter_roll_requested()
 signal menu_opened_changed(is_open: bool)
 
 @onready var input_blocker: Control = $InputBlocker
@@ -9,6 +10,7 @@ signal menu_opened_changed(is_open: bool)
 @onready var menu_button: Button = $MenuButton
 @onready var main_menu_action_button: Button = $MenuPanel/MenuPanelMargin/MenuActions/MainMenuActionButton
 @onready var new_game_action_button: Button = $MenuPanel/MenuPanelMargin/MenuActions/NewGameActionButton
+@onready var roll_starter_action_button: Button = $MenuPanel/MenuPanelMargin/MenuActions/RollStarterActionButton
 
 var is_menu_open: bool = false
 
@@ -16,6 +18,7 @@ func _ready() -> void:
 	menu_button.pressed.connect(_on_menu_toggle_pressed)
 	main_menu_action_button.pressed.connect(_on_main_menu_action_pressed)
 	new_game_action_button.pressed.connect(_on_new_game_action_pressed)
+	roll_starter_action_button.pressed.connect(_on_roll_starter_action_pressed)
 	_apply_menu_button_style()
 	set_menu_open(false)
 
@@ -40,6 +43,10 @@ func _on_main_menu_action_pressed() -> void:
 func _on_new_game_action_pressed() -> void:
 	set_menu_open(false)
 	new_game_requested.emit()
+
+func _on_roll_starter_action_pressed() -> void:
+	set_menu_open(false)
+	starter_roll_requested.emit()
 
 func _apply_menu_button_style() -> void:
 	var normal_style: StyleBoxFlat = StyleBoxFlat.new()

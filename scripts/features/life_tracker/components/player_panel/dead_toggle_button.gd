@@ -1,5 +1,4 @@
 extends Button
-class_name DeadToggleButton
 
 signal dead_toggled(is_dead: bool)
 

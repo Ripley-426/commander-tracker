@@ -50,6 +50,12 @@ func _get_commander_row_count(panel: Control) -> int:
 	var commander_list: VBoxContainer = panel.get_node("CommanderDamageContainer/CommanderDamageList")
 	return commander_list.get_child_count()
 
+func _open_starter_roll_from_menu(tracker: Control) -> void:
+	var menu_button: Button = tracker.get_node("TrackerMenuOverlay/MenuButton")
+	var roll_starter_action_button: Button = tracker.get_node("TrackerMenuOverlay/MenuPanel/MenuPanelMargin/MenuActions/RollStarterActionButton")
+	menu_button.pressed.emit()
+	roll_starter_action_button.pressed.emit()
+
 func test_ready_renders_expected_panel_count() -> void:
 	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
 	var tracker: Control = _create_tracker(state)
@@ -526,4 +532,38 @@ func test_menu_button_sets_input_blocker_to_ignore_when_closed() -> void:
 	menu_button.pressed.emit()
 	menu_button.pressed.emit()
 	assert_eq(input_blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
+
+func test_roll_starter_action_opens_starter_roll_overlay() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var tracker: Control = _create_tracker(state)
+	_open_starter_roll_from_menu(tracker)
+
+	var starter_roll_overlay: Control = tracker.get_node("StarterRollOverlay")
+	assert_true(starter_roll_overlay.visible)
+
+func test_roll_starter_excludes_dead_players_from_candidates() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var tracker: Control = _create_tracker(state)
+	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
+	var source_panel: Control = board_container.get_child(0)
+	var dead_button: Button = source_panel.get_node("DeadButton")
+	dead_button.pressed.emit()
+
+	_open_starter_roll_from_menu(tracker)
+	var starter_roll_overlay: Control = tracker.get_node("StarterRollOverlay")
+	assert_eq(int(starter_roll_overlay.call("get_current_candidate_count")), 1)
+
+func test_starting_roll_winner_gets_crown_in_name_label() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var tracker: Control = _create_tracker(state)
+	var starter_roll_overlay: Control = tracker.get_node("StarterRollOverlay")
+	var forced_values: Array[int] = [2, 6]
+	starter_roll_overlay.call("set_forced_roll_values", forced_values)
+	var roll_players: Array[Dictionary] = tracker.call("_build_starter_roll_players")
+	starter_roll_overlay.call("start_roll_for_players", roll_players, false)
+
+	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
+	var winner_panel: Control = board_container.get_child(1)
+	var name_label: Label = winner_panel.get_node("HeaderArea/NameLabel")
+	assert_true(name_label.text.ends_with(" ♕"))
 

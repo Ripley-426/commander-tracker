@@ -1,7 +1,7 @@
 [gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://scripts/features/life_tracker/components/commander_damage_row.gd" id="1_row"]
-[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/hold_repeat_button.tscn" id="2_hold_button"]
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/player_panel/commander_damage_row.gd" id="1_row"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/player_panel/hold_repeat_button.tscn" id="2_hold_button"]
 
 [node name="CommanderDamageRow" type="HBoxContainer"]
 custom_minimum_size = Vector2(0, 60)

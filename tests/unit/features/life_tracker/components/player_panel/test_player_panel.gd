@@ -34,7 +34,7 @@ func _tap_commander_button(button: Button) -> void:
 	button.button_up.emit()
 
 func _create_panel() -> Control:
-	var scene: PackedScene = load("res://scenes/features/life_tracker/components/player_panel.tscn")
+	var scene: PackedScene = load("res://scenes/features/life_tracker/components/player_panel/player_panel.tscn")
 	var panel: Control = scene.instantiate()
 	add_child_autofree(panel)
 	return panel

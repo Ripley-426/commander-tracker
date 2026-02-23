@@ -7,13 +7,13 @@ class FakeCommanderDamageComponent extends Control:
 		is_interactable = enabled
 
 func _create_presenter() -> Node:
-	var scene: PackedScene = load("res://scenes/features/life_tracker/components/player_dead_state_presenter.tscn")
+	var scene: PackedScene = load("res://scenes/features/life_tracker/components/player_panel/player_dead_state_presenter.tscn")
 	var presenter: Node = scene.instantiate()
 	add_child_autofree(presenter)
 	return presenter
 
 func _create_hold_button() -> Button:
-	var scene: PackedScene = load("res://scenes/features/life_tracker/components/hold_repeat_button.tscn")
+	var scene: PackedScene = load("res://scenes/features/life_tracker/components/player_panel/hold_repeat_button.tscn")
 	var button: Button = scene.instantiate()
 	add_child_autofree(button)
 	return button

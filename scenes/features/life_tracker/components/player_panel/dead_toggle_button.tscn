@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/features/life_tracker/components/dead_toggle_button.gd" id="1_dead_toggle"]
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/player_panel/dead_toggle_button.gd" id="1_dead_toggle"]
 
 [node name="DeadToggleButton" type="Button"]
 focus_mode = 0

@@ -1,10 +1,10 @@
 [gd_scene load_steps=6 format=3]
 
-[ext_resource type="Script" path="res://scripts/features/life_tracker/components/player_panel.gd" id="1_panel"]
-[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/hold_repeat_button.tscn" id="2_hold_button"]
-[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/dead_toggle_button.tscn" id="3_dead_button"]
-[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/commander_damage_list.tscn" id="4_commander_list"]
-[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/player_dead_state_presenter.tscn" id="5_dead_presenter"]
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/player_panel/player_panel.gd" id="1_panel"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/player_panel/hold_repeat_button.tscn" id="2_hold_button"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/player_panel/dead_toggle_button.tscn" id="3_dead_button"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/player_panel/commander_damage_list.tscn" id="4_commander_list"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/player_panel/player_dead_state_presenter.tscn" id="5_dead_presenter"]
 
 [node name="PlayerPanel" type="Panel"]
 custom_minimum_size = Vector2(220, 180)

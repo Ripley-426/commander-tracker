@@ -1,7 +1,6 @@
 extends MarginContainer
-class_name CommanderDamageList
 
-const COMMANDER_DAMAGE_ROW_SCENE: PackedScene = preload("res://scenes/features/life_tracker/components/commander_damage_row.tscn")
+const COMMANDER_DAMAGE_ROW_SCENE: PackedScene = preload("res://scenes/features/life_tracker/components/player_panel/commander_damage_row.tscn")
 
 signal delta_requested(source_player_index: int, delta: int)
 

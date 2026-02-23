@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3]
 
-[ext_resource type="Script" path="res://scripts/features/life_tracker/components/tracker_menu_overlay.gd" id="1_overlay"]
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/menu/tracker_menu_overlay.gd" id="1_overlay"]
 
 [node name="TrackerMenuOverlay" type="Control"]
 layout_mode = 1
@@ -54,6 +54,11 @@ text = "Main Menu"
 custom_minimum_size = Vector2(190, 44)
 layout_mode = 2
 text = "New Game"
+
+[node name="RollStarterActionButton" type="Button" parent="MenuPanel/MenuPanelMargin/MenuActions"]
+custom_minimum_size = Vector2(190, 44)
+layout_mode = 2
+text = "Roll Starter"
 
 [node name="MenuButton" type="Button" parent="."]
 layout_mode = 1

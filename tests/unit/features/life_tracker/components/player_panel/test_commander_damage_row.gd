@@ -15,7 +15,7 @@ func before_each() -> void:
 	total_delta = 0
 
 func _create_row() -> Control:
-	var scene: PackedScene = load("res://scenes/features/life_tracker/components/commander_damage_row.tscn")
+	var scene: PackedScene = load("res://scenes/features/life_tracker/components/player_panel/commander_damage_row.tscn")
 	var row: Control = scene.instantiate()
 	add_child_autofree(row)
 	return row

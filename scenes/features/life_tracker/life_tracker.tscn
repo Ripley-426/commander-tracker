@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/features/life_tracker/life_tracker_screen.gd" id="1_tracker"]
-[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/tracker_menu_overlay.tscn" id="2_menu_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/menu/tracker_menu_overlay.tscn" id="2_menu_overlay"]
+[ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/dice_roll/starter_roll_overlay.tscn" id="3_starter_roll_overlay"]
 
 [node name="LifeTracker" type="Control"]
 layout_mode = 3
@@ -25,3 +26,5 @@ layout_mode = 2
 size_flags_vertical = 3
 
 [node name="TrackerMenuOverlay" parent="." instance=ExtResource("2_menu_overlay")]
+
+[node name="StarterRollOverlay" parent="." instance=ExtResource("3_starter_roll_overlay")]

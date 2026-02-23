@@ -1,5 +1,4 @@
 extends Node
-class_name PlayerDeadStatePresenter
 
 func apply_state(panel: Panel, base_panel_color: Color, is_dead: bool, top_life_button: Button, bottom_life_button: Button, commander_damage_component: Control) -> void:
 	top_life_button.call("set_interactable", not is_dead)

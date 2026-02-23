@@ -12,7 +12,7 @@ func before_each() -> void:
 	last_delta = 0
 
 func _create_list() -> Control:
-	var scene: PackedScene = load("res://scenes/features/life_tracker/components/commander_damage_list.tscn")
+	var scene: PackedScene = load("res://scenes/features/life_tracker/components/player_panel/commander_damage_list.tscn")
 	var list: Control = scene.instantiate()
 	add_child_autofree(list)
 	return list
