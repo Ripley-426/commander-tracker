@@ -280,6 +280,32 @@ func test_dead_button_is_anchored_to_bottom_right() -> void:
 	assert_true(is_equal_approx(dead_button.anchor_left, 1.0))
 	assert_true(is_equal_approx(dead_button.anchor_top, 1.0))
 
+func test_dead_button_has_double_touch_size() -> void:
+	var panel: Control = _create_panel()
+	var dead_button: Button = panel.get_node("DeadButton")
+	var dead_width: float = dead_button.offset_right - dead_button.offset_left
+	var dead_height: float = dead_button.offset_bottom - dead_button.offset_top
+	assert_true(dead_width >= 96.0)
+	assert_true(dead_height >= 96.0)
+
+func test_dead_button_skull_uses_large_font() -> void:
+	var panel: Control = _create_panel()
+	var dead_button: Button = panel.get_node("DeadButton")
+	var skull_label: Label = dead_button.get_node("SkullLabel")
+	var font_size: int = int(skull_label.get("theme_override_font_sizes/font_size"))
+	assert_true(font_size >= 70)
+
+func test_dead_button_skull_label_is_centered() -> void:
+	var panel: Control = _create_panel()
+	var dead_button: Button = panel.get_node("DeadButton")
+	var skull_label: Label = dead_button.get_node("SkullLabel")
+	assert_true(is_equal_approx(skull_label.anchor_left, 0.0))
+	assert_true(is_equal_approx(skull_label.anchor_top, 0.0))
+	assert_true(is_equal_approx(skull_label.anchor_right, 1.0))
+	assert_true(is_equal_approx(skull_label.anchor_bottom, 1.0))
+	assert_eq(skull_label.horizontal_alignment, HORIZONTAL_ALIGNMENT_CENTER)
+	assert_eq(skull_label.vertical_alignment, VERTICAL_ALIGNMENT_CENTER)
+
 func test_dead_button_press_desaturates_panel_color() -> void:
 	var panel: Control = _create_panel()
 	panel.call("setup", 1, "Player 2", 40, Color(0.86, 0.26, 0.26, 1.0))

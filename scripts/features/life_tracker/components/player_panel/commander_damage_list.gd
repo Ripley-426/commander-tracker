@@ -1,12 +1,17 @@
 extends MarginContainer
 
 const COMMANDER_DAMAGE_ROW_SCENE: PackedScene = preload("res://scenes/features/life_tracker/components/player_panel/commander_damage_row.tscn")
+const OPPONENT_ROW_SEPARATION: int = 40
 
 signal delta_requested(source_player_index: int, delta: int)
 
 @onready var commander_damage_container: VBoxContainer = $CommanderDamageList
 
 var commander_damage_labels_by_source: Dictionary = {}
+
+func _ready() -> void:
+	# Enforce row spacing in code so it is consistent even if scene/theme overrides differ on device.
+	commander_damage_container.add_theme_constant_override("separation", OPPONENT_ROW_SEPARATION)
 
 func setup_rows(commander_rows: Array[Dictionary], is_dead: bool) -> void:
 	_clear_children(commander_damage_container)

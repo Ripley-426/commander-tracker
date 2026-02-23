@@ -76,3 +76,9 @@ func test_row_delta_is_forwarded_by_list_signal() -> void:
 	plus_button.button_down.emit()
 	plus_button.button_up.emit()
 	assert_eq(last_delta, 1)
+
+func test_commander_rows_have_half_button_padding_between_opponents() -> void:
+	var list: Control = _create_list()
+	var container: VBoxContainer = list.get_node("CommanderDamageList")
+	var separation: int = int(container.get_theme_constant("separation"))
+	assert_true(separation >= 40)
