@@ -37,6 +37,15 @@ func _create_tracker_and_store(initial_state: Dictionary) -> Dictionary:
 	add_child_autofree(tracker)
 	return {"tracker": tracker, "store": fake_store}
 
+func _create_tracker_from_store(fake_store: FakeStore) -> Control:
+	var scene: PackedScene = load("res://scenes/features/life_tracker/life_tracker.tscn")
+	var tracker: Control = scene.instantiate()
+	var service_script: GDScript = load("res://scripts/domain/game_session_service.gd")
+	tracker.store = fake_store
+	tracker.session_service = service_script.new(fake_store)
+	add_child_autofree(tracker)
+	return tracker
+
 func _tap_top_life_button(panel: Control) -> void:
 	var top_hit_button: Button = panel.get_node("HitZones/TopHitButton")
 	top_hit_button.button_down.emit()
@@ -565,5 +574,22 @@ func test_starting_roll_winner_gets_crown_in_name_label() -> void:
 	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
 	var winner_panel: Control = board_container.get_child(1)
 	var name_label: Label = winner_panel.get_node("HeaderArea/NameLabel")
-	assert_true(name_label.text.ends_with(" ♕"))
+	assert_true(name_label.text.ends_with(" \u2655"))
+
+func test_starting_roll_winner_is_persisted_after_reload() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var context: Dictionary = _create_tracker_and_store(state)
+	var tracker: Control = context["tracker"]
+	var fake_store: FakeStore = context["store"]
+	var starter_roll_overlay: Control = tracker.get_node("StarterRollOverlay")
+	var forced_values: Array[int] = [2, 6]
+	starter_roll_overlay.call("set_forced_roll_values", forced_values)
+	var roll_players: Array[Dictionary] = tracker.call("_build_starter_roll_players")
+	starter_roll_overlay.call("start_roll_for_players", roll_players, false)
+
+	var reloaded_tracker: Control = _create_tracker_from_store(fake_store)
+	var board_container: Control = reloaded_tracker.get_node("VBoxContainer/BoardContainer")
+	var winner_panel: Control = board_container.get_child(1)
+	var name_label: Label = winner_panel.get_node("HeaderArea/NameLabel")
+	assert_true(name_label.text.ends_with(" \u2655"))
 

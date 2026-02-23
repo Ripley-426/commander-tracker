@@ -109,6 +109,7 @@ static func validate(data: Dictionary) -> bool:
 static func normalize_loaded_state(data: Dictionary) -> Dictionary:
 	var normalized: Dictionary = data.duplicate(true)
 	normalized["version"] = _to_int(normalized.get("version", VERSION))
+	normalized["starting_player_index"] = _to_int(normalized.get("starting_player_index", -1))
 
 	var settings_value: Variant = normalized.get("settings", {})
 	var settings: Dictionary = settings_value if typeof(settings_value) == TYPE_DICTIONARY else {}

@@ -40,3 +40,9 @@ func test_validate_rejects_invalid_state() -> void:
 		"players": []
 	}
 	assert_false(GAME_STATE_SCRIPT.validate(invalid_state))
+
+func test_normalize_loaded_state_converts_starting_player_index_to_int() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	state["starting_player_index"] = 1.0
+	var normalized: Dictionary = GAME_STATE_SCRIPT.normalize_loaded_state(state)
+	assert_eq(typeof(normalized.get("starting_player_index", null)), TYPE_INT)

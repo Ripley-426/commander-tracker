@@ -26,6 +26,21 @@ func test_start_roll_makes_overlay_visible() -> void:
 	overlay.call("start_roll_for_players", _build_players(), false)
 	assert_true(overlay.visible)
 
+func test_center_dice_container_is_center_anchored() -> void:
+	var overlay: Control = _create_overlay()
+	var center_dice_container: HBoxContainer = overlay.get_node("MainPanel/PanelMargin/MainContent/CenterDiceContainer")
+	assert_eq(center_dice_container.anchor_left, 0.5)
+	assert_eq(center_dice_container.anchor_top, 0.5)
+	assert_eq(center_dice_container.anchor_right, 0.5)
+	assert_eq(center_dice_container.anchor_bottom, 0.5)
+
+func test_hint_label_is_bottom_anchored_with_padding() -> void:
+	var overlay: Control = _create_overlay()
+	var hint_label: Label = overlay.get_node("MainPanel/PanelMargin/MainContent/HintLabel")
+	assert_eq(hint_label.anchor_top, 1.0)
+	assert_eq(hint_label.anchor_bottom, 1.0)
+	assert_true(hint_label.offset_bottom < 0.0)
+
 func test_non_animated_roll_sets_expected_winner() -> void:
 	var overlay: Control = _create_overlay()
 	var forced_values: Array[int] = [2, 6, 4]

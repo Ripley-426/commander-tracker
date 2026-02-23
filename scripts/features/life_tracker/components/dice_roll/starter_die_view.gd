@@ -8,6 +8,10 @@ var roll_value: int = 1
 var die_color: Color = Color(0.10, 0.10, 0.10, 1.0)
 var is_winner: bool = false
 var is_compact: bool = false
+var winner_pulse_tween: Tween = null
+
+func _ready() -> void:
+	_update_pivot_to_center()
 
 func setup(p_player_index: int, p_player_name: String, p_die_color: Color, compact: bool = false) -> void:
 	player_index = p_player_index
@@ -24,6 +28,10 @@ func set_roll_value(value: int) -> void:
 func set_winner(next_is_winner: bool) -> void:
 	is_winner = next_is_winner
 	winner_badge_label.visible = is_winner
+	if is_winner:
+		_start_winner_pulse()
+	else:
+		_stop_winner_pulse()
 	queue_redraw()
 
 func set_compact(compact: bool) -> void:
@@ -32,6 +40,26 @@ func set_compact(compact: bool) -> void:
 	name_label.add_theme_font_size_override("font_size", 22 if compact else 30)
 	winner_badge_label.add_theme_font_size_override("font_size", 18 if compact else 22)
 	queue_redraw()
+
+func _start_winner_pulse() -> void:
+	_stop_winner_pulse()
+	winner_pulse_tween = create_tween()
+	winner_pulse_tween.set_loops()
+	winner_pulse_tween.tween_property(self, "scale", Vector2(1.08, 1.08), 0.6)
+	winner_pulse_tween.tween_property(self, "scale", Vector2.ONE, 0.6)
+
+func _stop_winner_pulse() -> void:
+	if winner_pulse_tween != null and winner_pulse_tween.is_valid():
+		winner_pulse_tween.kill()
+	winner_pulse_tween = null
+	scale = Vector2.ONE
+
+func _notification(what: int) -> void:
+	if what == NOTIFICATION_RESIZED:
+		_update_pivot_to_center()
+
+func _update_pivot_to_center() -> void:
+	pivot_offset = size * 0.5
 
 func _draw() -> void:
 	var die_rect: Rect2 = _get_die_rect()

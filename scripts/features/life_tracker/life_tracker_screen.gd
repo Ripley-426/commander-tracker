@@ -3,6 +3,7 @@ extends Control
 const PLAYER_PANEL_SCENE: PackedScene = preload("res://scenes/features/life_tracker/components/player_panel/player_panel.tscn")
 const PLAYER_STATE_QUERIES: GDScript = preload("res://scripts/domain/player_state_queries.gd")
 const PERSISTENCE_STORE_SCRIPT: GDScript = preload("res://scripts/data/persistence_store.gd")
+const STARTING_PLAYER_INDEX_KEY: String = "starting_player_index"
 const PLAYER_COLORS: Array[Color] = [
 	Color(0.86, 0.26, 0.26, 1.0),
 	Color(0.22, 0.58, 0.92, 1.0),
@@ -41,6 +42,7 @@ func _ready() -> void:
 	if game_state.is_empty():
 		_open_main_menu()
 		return
+	starting_player_index = _read_starting_player_index(game_state)
 
 	_render_state()
 
@@ -187,6 +189,8 @@ func _on_starter_roll_requested() -> void:
 
 func _on_starter_roll_winner_decided(player_index: int) -> void:
 	starting_player_index = player_index
+	game_state[STARTING_PLAYER_INDEX_KEY] = starting_player_index
+	_commit_state()
 	_render_state()
 
 func _clear_children(node: Node) -> void:
@@ -286,3 +290,7 @@ func _build_starter_roll_players() -> Array[Dictionary]:
 			"player_color": PLAYER_COLORS[i % PLAYER_COLORS.size()]
 		})
 	return roll_players
+
+func _read_starting_player_index(state: Dictionary) -> int:
+	var value: Variant = state.get(STARTING_PLAYER_INDEX_KEY, -1)
+	return int(value)
