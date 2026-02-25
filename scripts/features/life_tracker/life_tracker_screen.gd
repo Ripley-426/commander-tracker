@@ -60,6 +60,7 @@ func _notification(what: int) -> void:
 func _render_state() -> void:
 	_sync_dead_players_from_commander_damage()
 	_clear_children(board_container)
+	tracker_menu_overlay.call("set_menu_colors", _build_menu_button_colors())
 
 	var players: Array = game_state.get("players", [])
 	var settings_value: Variant = game_state.get("settings", {})
@@ -331,6 +332,15 @@ func _build_starter_roll_players() -> Array[Dictionary]:
 			"player_color": PLAYER_COLORS[i % PLAYER_COLORS.size()]
 		})
 	return roll_players
+
+func _build_menu_button_colors() -> Array[Color]:
+	var players_value: Variant = game_state.get("players", [])
+	var players: Array = players_value if typeof(players_value) == TYPE_ARRAY else []
+	var color_count: int = mini(max(players.size(), 1), PLAYER_COLORS.size())
+	var colors: Array[Color] = []
+	for i: int in range(color_count):
+		colors.append(PLAYER_COLORS[i % PLAYER_COLORS.size()])
+	return colors
 
 func _read_starting_player_index(state: Dictionary) -> int:
 	var value: Variant = state.get(STARTING_PLAYER_INDEX_KEY, -1)

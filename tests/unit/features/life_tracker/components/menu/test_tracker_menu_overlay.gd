@@ -59,6 +59,7 @@ func test_toggle_button_closes_menu_when_pressed_twice() -> void:
 	var menu_panel: Control = overlay.get_node("MenuPanel")
 	menu_button.pressed.emit()
 	menu_button.pressed.emit()
+	await get_tree().create_timer(0.6).timeout
 	assert_false(menu_panel.visible)
 
 func test_toggle_button_sets_input_blocker_to_ignore_when_closed() -> void:
@@ -67,24 +68,23 @@ func test_toggle_button_sets_input_blocker_to_ignore_when_closed() -> void:
 	var blocker: Control = overlay.get_node("InputBlocker")
 	menu_button.pressed.emit()
 	menu_button.pressed.emit()
+	await get_tree().create_timer(0.6).timeout
 	assert_eq(blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
 func test_main_menu_action_emits_main_menu_signal() -> void:
 	var overlay: Control = _create_overlay()
 	overlay.connect("main_menu_requested", Callable(self, "_on_main_menu_requested"))
 
-	var menu_button: Button = overlay.get_node("MenuButton")
 	var main_menu_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/MainMenuActionButton")
-	menu_button.pressed.emit()
+	overlay.call("set_menu_open", true)
 	main_menu_action_button.pressed.emit()
 	assert_eq(main_menu_requests, 1)
 
 func test_main_menu_action_closes_menu() -> void:
 	var overlay: Control = _create_overlay()
-	var menu_button: Button = overlay.get_node("MenuButton")
 	var menu_panel: Control = overlay.get_node("MenuPanel")
 	var main_menu_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/MainMenuActionButton")
-	menu_button.pressed.emit()
+	overlay.call("set_menu_open", true)
 	main_menu_action_button.pressed.emit()
 	assert_false(menu_panel.visible)
 
@@ -92,18 +92,16 @@ func test_new_game_action_emits_new_game_signal() -> void:
 	var overlay: Control = _create_overlay()
 	overlay.connect("new_game_requested", Callable(self, "_on_new_game_requested"))
 
-	var menu_button: Button = overlay.get_node("MenuButton")
 	var new_game_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/NewGameActionButton")
-	menu_button.pressed.emit()
+	overlay.call("set_menu_open", true)
 	new_game_action_button.pressed.emit()
 	assert_eq(new_game_requests, 1)
 
 func test_new_game_action_closes_menu() -> void:
 	var overlay: Control = _create_overlay()
-	var menu_button: Button = overlay.get_node("MenuButton")
 	var menu_panel: Control = overlay.get_node("MenuPanel")
 	var new_game_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/NewGameActionButton")
-	menu_button.pressed.emit()
+	overlay.call("set_menu_open", true)
 	new_game_action_button.pressed.emit()
 	assert_false(menu_panel.visible)
 
@@ -111,17 +109,34 @@ func test_roll_starter_action_emits_starter_roll_signal() -> void:
 	var overlay: Control = _create_overlay()
 	overlay.connect("starter_roll_requested", Callable(self, "_on_starter_roll_requested"))
 
-	var menu_button: Button = overlay.get_node("MenuButton")
 	var roll_starter_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/RollStarterActionButton")
-	menu_button.pressed.emit()
+	overlay.call("set_menu_open", true)
 	roll_starter_action_button.pressed.emit()
 	assert_eq(starter_roll_requests, 1)
 
 func test_roll_starter_action_closes_menu() -> void:
 	var overlay: Control = _create_overlay()
-	var menu_button: Button = overlay.get_node("MenuButton")
 	var menu_panel: Control = overlay.get_node("MenuPanel")
 	var roll_starter_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/RollStarterActionButton")
-	menu_button.pressed.emit()
+	overlay.call("set_menu_open", true)
 	roll_starter_action_button.pressed.emit()
+	assert_false(menu_panel.visible)
+
+func test_action_buttons_are_disabled_during_transition() -> void:
+	var overlay: Control = _create_overlay()
+	overlay.connect("main_menu_requested", Callable(self, "_on_main_menu_requested"))
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var main_menu_action_button: Button = overlay.get_node("MenuPanel/MenuPanelMargin/MenuActions/MainMenuActionButton")
+	menu_button.pressed.emit()
+	main_menu_action_button.pressed.emit()
+	assert_eq(main_menu_requests, 0)
+
+func test_second_tap_reverses_opening_transition() -> void:
+	var overlay: Control = _create_overlay()
+	var menu_button: Button = overlay.get_node("MenuButton")
+	var menu_panel: Control = overlay.get_node("MenuPanel")
+	menu_button.pressed.emit()
+	await get_tree().create_timer(0.2).timeout
+	menu_button.pressed.emit()
+	await get_tree().create_timer(0.6).timeout
 	assert_false(menu_panel.visible)

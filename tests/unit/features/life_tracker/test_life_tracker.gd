@@ -60,9 +60,9 @@ func _get_commander_row_count(panel: Control) -> int:
 	return commander_list.get_child_count()
 
 func _open_starter_roll_from_menu(tracker: Control) -> void:
-	var menu_button: Button = tracker.get_node("TrackerMenuOverlay/MenuButton")
+	var menu_overlay: Control = tracker.get_node("TrackerMenuOverlay")
 	var roll_starter_action_button: Button = tracker.get_node("TrackerMenuOverlay/MenuPanel/MenuPanelMargin/MenuActions/RollStarterActionButton")
-	menu_button.pressed.emit()
+	menu_overlay.call("set_menu_open", true)
 	roll_starter_action_button.pressed.emit()
 
 func test_ready_renders_expected_panel_count() -> void:
@@ -570,6 +570,7 @@ func test_menu_button_closes_menu_panel_when_pressed_twice() -> void:
 	var menu_button: Button = tracker.get_node("TrackerMenuOverlay/MenuButton")
 	menu_button.pressed.emit()
 	menu_button.pressed.emit()
+	await get_tree().create_timer(0.6).timeout
 	assert_false(menu_panel.visible)
 
 func test_menu_button_sets_input_blocker_to_ignore_when_closed() -> void:
@@ -579,6 +580,7 @@ func test_menu_button_sets_input_blocker_to_ignore_when_closed() -> void:
 	var menu_button: Button = tracker.get_node("TrackerMenuOverlay/MenuButton")
 	menu_button.pressed.emit()
 	menu_button.pressed.emit()
+	await get_tree().create_timer(0.6).timeout
 	assert_eq(input_blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
 func test_roll_starter_action_opens_starter_roll_overlay() -> void:

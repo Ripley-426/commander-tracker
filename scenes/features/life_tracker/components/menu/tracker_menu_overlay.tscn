@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/features/life_tracker/components/menu/tracker_menu_overlay.gd" id="1_overlay"]
+[ext_resource type="Script" path="res://scripts/features/life_tracker/components/menu/circular_reveal_layer.gd" id="2_reveal"]
 
 [node name="TrackerMenuOverlay" type="Control"]
 layout_mode = 1
@@ -22,43 +23,78 @@ grow_vertical = 2
 mouse_filter = 2
 z_index = 20
 
-[node name="MenuPanel" type="PanelContainer" parent="."]
+[node name="RevealLayer" type="Control" parent="."]
 visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+z_index = 25
+script = ExtResource("2_reveal")
+
+[node name="MenuPanel" type="Control" parent="."]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+modulate = Color(1, 1, 1, 0)
+z_index = 30
+
+[node name="MenuPanelMargin" type="MarginContainer" parent="MenuPanel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/margin_left = 72
+theme_override_constants/margin_top = 72
+theme_override_constants/margin_right = 72
+theme_override_constants/margin_bottom = 72
+
+[node name="MenuActions" type="VBoxContainer" parent="MenuPanel/MenuPanelMargin"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -152.0
-offset_top = -168.0
-offset_right = 152.0
-offset_bottom = 36.0
-z_index = 30
+offset_left = -240.0
+offset_top = -244.0
+offset_right = 240.0
+offset_bottom = 244.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+theme_override_constants/separation = 18
 
-[node name="MenuPanelMargin" type="MarginContainer" parent="MenuPanel"]
+[node name="MenuTitle" type="Label" parent="MenuPanel/MenuPanelMargin/MenuActions"]
+custom_minimum_size = Vector2(420, 56)
 layout_mode = 2
-theme_override_constants/margin_left = 12
-theme_override_constants/margin_top = 12
-theme_override_constants/margin_right = 12
-theme_override_constants/margin_bottom = 12
-
-[node name="MenuActions" type="VBoxContainer" parent="MenuPanel/MenuPanelMargin"]
-layout_mode = 2
-theme_override_constants/separation = 10
+theme_override_font_sizes/font_size = 46
+horizontal_alignment = 1
+text = "Game Menu"
 
 [node name="MainMenuActionButton" type="Button" parent="MenuPanel/MenuPanelMargin/MenuActions"]
-custom_minimum_size = Vector2(270, 52)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 text = "Main Menu"
 
 [node name="NewGameActionButton" type="Button" parent="MenuPanel/MenuPanelMargin/MenuActions"]
-custom_minimum_size = Vector2(270, 52)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 text = "New Game"
 
 [node name="RollStarterActionButton" type="Button" parent="MenuPanel/MenuPanelMargin/MenuActions"]
-custom_minimum_size = Vector2(270, 52)
+custom_minimum_size = Vector2(420, 84)
 layout_mode = 2
 text = "Roll Starter"
 
@@ -76,4 +112,3 @@ offset_bottom = 60.0
 focus_mode = 0
 text = ""
 z_index = 40
-
