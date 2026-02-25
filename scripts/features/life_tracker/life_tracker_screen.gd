@@ -75,12 +75,12 @@ func _render_state() -> void:
 		var life: int = int(player.get("life", 0))
 		var panel_color: Color = PLAYER_COLORS[i % PLAYER_COLORS.size()]
 		var slot: Dictionary = slots[i] if i < slots.size() else {"x": 0.05, "y": 0.05, "w": 0.40, "h": 0.40}
-		var should_rotate: bool = i < 2
+		var rotation_degrees: float = _get_panel_rotation_degrees(slot)
 		var commander_rows: Array[Dictionary] = PLAYER_STATE_QUERIES.build_commander_rows_for_target(game_state, i, PLAYER_COLORS)
 		commander_rows = _filter_commander_rows_for_alive_sources(commander_rows)
-		_add_player_panel(i, player_name, life, panel_color, slot, should_rotate, commander_rows)
+		_add_player_panel(i, player_name, life, panel_color, slot, rotation_degrees, commander_rows)
 
-func _add_player_panel(player_index: int, player_name: String, life: int, panel_color: Color, slot: Dictionary, should_rotate: bool, commander_rows: Array[Dictionary]) -> void:
+func _add_player_panel(player_index: int, player_name: String, life: int, panel_color: Color, slot: Dictionary, rotation_degrees: float, commander_rows: Array[Dictionary]) -> void:
 	var panel: Control = PLAYER_PANEL_SCENE.instantiate()
 	board_container.add_child(panel)
 
@@ -93,7 +93,8 @@ func _add_player_panel(player_index: int, player_name: String, life: int, panel_
 	panel.offset_right = 0.0
 	panel.offset_bottom = 0.0
 
-	panel.setup(player_index, player_name, life, panel_color, should_rotate, commander_rows)
+	panel.setup(player_index, player_name, life, panel_color, false, commander_rows)
+	panel.call("set_rotation_degrees_custom", rotation_degrees)
 	panel.life_delta_requested.connect(_on_life_delta_pressed)
 	panel.commander_delta_requested.connect(_on_commander_delta_pressed)
 	panel.dead_state_changed.connect(_on_player_dead_state_changed)
@@ -210,6 +211,8 @@ func _on_starter_roll_winner_decided(player_index: int) -> void:
 	_render_state()
 
 func _clear_children(node: Node) -> void:
+	if node == null:
+		return
 	for child: Node in node.get_children():
 		node.remove_child(child)
 		child.queue_free()
@@ -236,7 +239,24 @@ func _create_controller(p_session: RefCounted) -> RefCounted:
 
 func _get_layout_slots(layout_id: String, player_count: int) -> Array[Dictionary]:
 	var layout_script: GDScript = load("res://scripts/domain/player_layout_service.gd")
-	return layout_script.get_slots(layout_id, player_count)
+	return layout_script.get_slots(layout_id, player_count, true)
+
+func _get_panel_rotation_degrees(slot: Dictionary) -> float:
+	if slot.has("rotation_degrees"):
+		return float(slot.get("rotation_degrees", 0.0))
+	var x: float = float(slot.get("x", 0.0))
+	var y: float = float(slot.get("y", 0.0))
+	var w: float = float(slot.get("w", 0.0))
+	var h: float = float(slot.get("h", 0.0))
+	var center_x: float = x + (w * 0.5)
+	var center_y: float = y + (h * 0.5)
+	if center_x <= 0.34:
+		return 90.0
+	if center_x >= 0.66:
+		return -90.0
+	if center_y < 0.5:
+		return 180.0
+	return 0.0
 
 func _filter_commander_rows_for_alive_sources(rows: Array[Dictionary]) -> Array[Dictionary]:
 	var filtered_rows: Array[Dictionary] = []

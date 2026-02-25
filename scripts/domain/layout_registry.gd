@@ -23,8 +23,11 @@ static func get_layout_presets(player_count: int) -> Array[Dictionary]:
 		})
 	return presets
 
-static func get_slots(layout_id: String, player_count: int) -> Array[Dictionary]:
+static func get_slots(layout_id: String, player_count: int, is_portrait: bool = false) -> Array[Dictionary]:
 	var raw_slots: Array[Dictionary]
+	if is_portrait:
+		raw_slots = _get_portrait_slots(layout_id, player_count)
+		return raw_slots
 	match layout_id:
 		"p2_head_to_head":
 			raw_slots = _p2_head_to_head()
@@ -48,8 +51,34 @@ static func get_slots(layout_id: String, player_count: int) -> Array[Dictionary]
 			raw_slots = _fallback_grid(player_count)
 	return _maximize_slots(raw_slots, 0.0)
 
+static func _get_portrait_slots(layout_id: String, player_count: int) -> Array[Dictionary]:
+	match layout_id:
+		"p2_head_to_head":
+			return _p2_head_to_head_portrait()
+		"p3_side_left":
+			return _p3_side_left_portrait()
+		"p3_side_right":
+			return _p3_side_right_portrait()
+		"p4_two_facing_two":
+			return _p4_two_facing_two_portrait()
+		"p4_side_seats":
+			return _p4_side_seats_portrait()
+		"p5_side_bias_left":
+			return _p5_side_bias_left_portrait()
+		"p5_side_bias_right":
+			return _p5_side_bias_right_portrait()
+		"p6_three_vs_three":
+			return _p6_three_vs_three_portrait()
+		"p6_two_vs_two_sides":
+			return _p6_two_vs_two_sides_portrait()
+		_:
+			return _fallback_grid(player_count)
+
 static func _rect(x: float, y: float, w: float, h: float) -> Dictionary:
 	return {"x": x, "y": y, "w": w, "h": h}
+
+static func _rect_with_rotation(x: float, y: float, w: float, h: float, rotation_degrees: float) -> Dictionary:
+	return {"x": x, "y": y, "w": w, "h": h, "rotation_degrees": rotation_degrees}
 
 static func _p2_head_to_head() -> Array[Dictionary]:
 	return [
@@ -123,6 +152,83 @@ static func _p6_two_vs_two_sides() -> Array[Dictionary]:
 		_rect(0.50, 0.50, 0.30, 0.50),
 		_rect(0.00, 0.25, 0.20, 0.50),
 		_rect(0.80, 0.25, 0.20, 0.50)
+	]
+
+static func _p2_head_to_head_portrait() -> Array[Dictionary]:
+	return [
+		# P2 uses pre-rotation rectangles so visual bounds become full-height half-width after +/-90deg rotation.
+		_rect_with_rotation(0.25, 0.25, 1.00, 0.50, -90.0),  # Player 1 on the right (clockwise seating)
+		_rect_with_rotation(-0.25, 0.25, 1.00, 0.50, 90.0)   # Player 2 on the left
+	]
+
+static func _p3_side_left_portrait() -> Array[Dictionary]:
+	return [
+		_rect_with_rotation(0.00, 0.00, 0.50, 1.00, 90.0),
+		_rect_with_rotation(0.50, 0.00, 0.50, 0.50, -90.0),
+		_rect_with_rotation(0.50, 0.50, 0.50, 0.50, -90.0)
+	]
+
+static func _p3_side_right_portrait() -> Array[Dictionary]:
+	return [
+		_rect_with_rotation(0.50, 0.00, 0.50, 1.00, -90.0),
+		_rect_with_rotation(0.00, 0.00, 0.50, 0.50, 90.0),
+		_rect_with_rotation(0.00, 0.50, 0.50, 0.50, 90.0)
+	]
+
+static func _p4_two_facing_two_portrait() -> Array[Dictionary]:
+	return [
+		# Portrait viewport is 1080x1920 (9:16). Rotated panels need pre-rotation wide/short rects
+		# so their post-rotation bounds fill quarter-screen seats.
+		_rect_with_rotation(0.305556, 0.109375, 0.888889, 0.281250, -90.0), # P1 top-right
+		_rect_with_rotation(0.305556, 0.609375, 0.888889, 0.281250, -90.0), # P2 bottom-right
+		_rect_with_rotation(-0.194444, 0.109375, 0.888889, 0.281250, 90.0), # P3 top-left
+		_rect_with_rotation(-0.194444, 0.609375, 0.888889, 0.281250, 90.0)  # P4 bottom-left
+	]
+
+static func _p4_side_seats_portrait() -> Array[Dictionary]:
+	return [
+		_rect_with_rotation(0.305556, 0.109375, 0.888889, 0.281250, -90.0),
+		_rect_with_rotation(0.305556, 0.609375, 0.888889, 0.281250, -90.0),
+		_rect_with_rotation(-0.194444, 0.109375, 0.888889, 0.281250, 90.0),
+		_rect_with_rotation(-0.194444, 0.609375, 0.888889, 0.281250, 90.0)
+	]
+
+static func _p5_side_bias_left_portrait() -> Array[Dictionary]:
+	return [
+		_rect_with_rotation(0.00, 0.00, 0.50, 0.34, 90.0),
+		_rect_with_rotation(0.00, 0.34, 0.50, 0.33, 90.0),
+		_rect_with_rotation(0.00, 0.67, 0.50, 0.33, 90.0),
+		_rect_with_rotation(0.50, 0.00, 0.50, 0.50, -90.0),
+		_rect_with_rotation(0.50, 0.50, 0.50, 0.50, -90.0)
+	]
+
+static func _p5_side_bias_right_portrait() -> Array[Dictionary]:
+	return [
+		_rect_with_rotation(0.50, 0.00, 0.50, 0.34, -90.0),
+		_rect_with_rotation(0.50, 0.34, 0.50, 0.33, -90.0),
+		_rect_with_rotation(0.50, 0.67, 0.50, 0.33, -90.0),
+		_rect_with_rotation(0.00, 0.00, 0.50, 0.50, 90.0),
+		_rect_with_rotation(0.00, 0.50, 0.50, 0.50, 90.0)
+	]
+
+static func _p6_three_vs_three_portrait() -> Array[Dictionary]:
+	return [
+		_rect_with_rotation(0.00, 0.00, 0.50, 0.333333, 90.0),
+		_rect_with_rotation(0.00, 0.333333, 0.50, 0.333333, 90.0),
+		_rect_with_rotation(0.00, 0.666666, 0.50, 0.333334, 90.0),
+		_rect_with_rotation(0.50, 0.00, 0.50, 0.333333, -90.0),
+		_rect_with_rotation(0.50, 0.333333, 0.50, 0.333333, -90.0),
+		_rect_with_rotation(0.50, 0.666666, 0.50, 0.333334, -90.0)
+	]
+
+static func _p6_two_vs_two_sides_portrait() -> Array[Dictionary]:
+	return [
+		_rect_with_rotation(0.00, 0.00, 0.50, 0.333333, 90.0),
+		_rect_with_rotation(0.00, 0.333333, 0.50, 0.333333, 90.0),
+		_rect_with_rotation(0.00, 0.666666, 0.50, 0.333334, 90.0),
+		_rect_with_rotation(0.50, 0.00, 0.50, 0.333333, -90.0),
+		_rect_with_rotation(0.50, 0.333333, 0.50, 0.333333, -90.0),
+		_rect_with_rotation(0.50, 0.666666, 0.50, 0.333334, -90.0)
 	]
 
 static func _fallback_grid(player_count: int) -> Array[Dictionary]:

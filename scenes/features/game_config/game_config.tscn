@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=3 format=3]
 
 [ext_resource type="Script" path="res://scripts/features/game_config/game_config_screen.gd" id="1_config"]
+[ext_resource type="Theme" path="res://assets/themes/app_theme.tres" id="2_theme"]
 
 [node name="GameConfig" type="Control"]
 layout_mode = 3
@@ -10,6 +11,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_config")
+theme = ExtResource("2_theme")
 
 [node name="CenterContainer" type="CenterContainer" parent="."]
 layout_mode = 1
@@ -21,7 +23,7 @@ grow_vertical = 2
 
 [node name="PanelContainer" type="PanelContainer" parent="CenterContainer"]
 layout_mode = 2
-custom_minimum_size = Vector2(820, 520)
+custom_minimum_size = Vector2(420, 620)
 
 [node name="MarginContainer" type="MarginContainer" parent="CenterContainer/PanelContainer"]
 layout_mode = 2
@@ -60,17 +62,17 @@ text = "Layout Preset"
 [node name="LayoutOptionButton" type="OptionButton" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 
-[node name="ButtonsRow" type="HBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
+[node name="ButtonsRow" type="VBoxContainer" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer"]
 layout_mode = 2
 alignment = 1
 theme_override_constants/separation = 10
 
 [node name="StartButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonsRow"]
-custom_minimum_size = Vector2(180, 48)
+custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 text = "Start Game"
 
 [node name="BackButton" type="Button" parent="CenterContainer/PanelContainer/MarginContainer/VBoxContainer/ButtonsRow"]
-custom_minimum_size = Vector2(180, 48)
+custom_minimum_size = Vector2(240, 52)
 layout_mode = 2
 text = "Back"

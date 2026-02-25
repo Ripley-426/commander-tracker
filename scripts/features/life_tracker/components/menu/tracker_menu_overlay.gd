@@ -49,14 +49,15 @@ func _on_roll_starter_action_pressed() -> void:
 	starter_roll_requested.emit()
 
 func _apply_menu_button_style() -> void:
+	var corner_radius: int = int(round(menu_button.size.y * 0.5))
 	var normal_style: StyleBoxFlat = StyleBoxFlat.new()
 	normal_style.bg_color = Color(0.10, 0.10, 0.10, 1.0)
-	normal_style.corner_radius_top_left = 30
-	normal_style.corner_radius_top_right = 30
-	normal_style.corner_radius_bottom_left = 30
-	normal_style.corner_radius_bottom_right = 30
+	normal_style.corner_radius_top_left = corner_radius
+	normal_style.corner_radius_top_right = corner_radius
+	normal_style.corner_radius_bottom_left = corner_radius
+	normal_style.corner_radius_bottom_right = corner_radius
 	normal_style.shadow_color = Color(0.0, 0.0, 0.0, 0.35)
-	normal_style.shadow_size = 6
+	normal_style.shadow_size = max(6, int(round(menu_button.size.y * 0.1)))
 
 	var hover_style: StyleBoxFlat = normal_style.duplicate() as StyleBoxFlat
 	hover_style.bg_color = Color(0.15, 0.15, 0.15, 1.0)

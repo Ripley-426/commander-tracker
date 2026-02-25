@@ -34,6 +34,11 @@ func test_menu_starts_with_input_blocker_ignoring_input() -> void:
 	var blocker: Control = overlay.get_node("InputBlocker")
 	assert_eq(blocker.mouse_filter, Control.MOUSE_FILTER_IGNORE)
 
+func test_menu_button_size_is_doubled() -> void:
+	var overlay: Control = _create_overlay()
+	var menu_button: Button = overlay.get_node("MenuButton")
+	assert_eq(menu_button.size, Vector2(120.0, 120.0))
+
 func test_toggle_button_opens_menu() -> void:
 	var overlay: Control = _create_overlay()
 	var menu_button: Button = overlay.get_node("MenuButton")

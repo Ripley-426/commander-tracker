@@ -2,6 +2,7 @@ extends Control
 
 const STARTER_DIE_SCENE: PackedScene = preload("res://scenes/features/life_tracker/components/dice_roll/starter_die_view.tscn")
 const STARTER_ROLL_ENGINE_SCRIPT: GDScript = preload("res://scripts/features/life_tracker/components/dice_roll/starter_roll_engine.gd")
+const HISTORY_PANEL_MARGIN: float = 14.0
 
 signal closed()
 signal winner_decided(player_index: int)
@@ -34,6 +35,14 @@ func _ready() -> void:
 	main_panel.gui_input.connect(_on_overlay_input)
 	round_delay_timer.timeout.connect(_on_round_delay_timeout)
 	roll_tick_timer.timeout.connect(_on_roll_tick_timeout)
+	call_deferred("_apply_portrait_rotation")
+
+func _notification(what: int) -> void:
+	if what != NOTIFICATION_RESIZED:
+		return
+	if not is_node_ready():
+		return
+	_apply_portrait_rotation()
 
 func start_roll_for_players(players: Array[Dictionary], animate_round: bool = true) -> void:
 	candidate_players = players.duplicate(true)
@@ -178,6 +187,7 @@ func _finish_current_round() -> void:
 
 func _copy_current_round_to_history() -> void:
 	history_panel.call("show_history", candidate_players, current_round_results)
+	_apply_portrait_rotation()
 
 func _on_round_delay_timeout() -> void:
 	_start_round()
@@ -186,3 +196,26 @@ func _clear_children(node: Node) -> void:
 	for child: Node in node.get_children():
 		node.remove_child(child)
 		child.queue_free()
+
+func _apply_portrait_rotation() -> void:
+	if main_panel == null or history_panel == null:
+		return
+	main_panel.rotation_degrees = -90.0
+	main_panel.pivot_offset = main_panel.size * 0.5
+	history_panel.rotation_degrees = -90.0
+	history_panel.pivot_offset = history_panel.size * 0.5
+	_position_history_panel_for_view()
+
+func _position_history_panel_for_view() -> void:
+	var panel_size: Vector2 = history_panel.size
+	if panel_size.is_equal_approx(Vector2.ZERO):
+		panel_size = history_panel.custom_minimum_size
+
+	var rotated_size: Vector2 = Vector2(panel_size.y, panel_size.x)
+	var target_top_left: Vector2 = Vector2(HISTORY_PANEL_MARGIN, HISTORY_PANEL_MARGIN)
+	if size.y >= size.x:
+		var bottom_y: float = size.y - HISTORY_PANEL_MARGIN - rotated_size.y
+		target_top_left.y = max(HISTORY_PANEL_MARGIN, bottom_y)
+
+	var target_center: Vector2 = target_top_left + (rotated_size * 0.5)
+	history_panel.position = target_center - (panel_size * 0.5)

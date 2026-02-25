@@ -1,8 +1,9 @@
-[gd_scene load_steps=4 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/features/life_tracker/life_tracker_screen.gd" id="1_tracker"]
 [ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/menu/tracker_menu_overlay.tscn" id="2_menu_overlay"]
 [ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/dice_roll/starter_roll_overlay.tscn" id="3_starter_roll_overlay"]
+[ext_resource type="Theme" path="res://assets/themes/app_theme.tres" id="4_theme"]
 
 [node name="LifeTracker" type="Control"]
 layout_mode = 3
@@ -12,6 +13,7 @@ anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("1_tracker")
+theme = ExtResource("4_theme")
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1

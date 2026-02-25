@@ -4,7 +4,7 @@
 [ext_resource type="PackedScene" path="res://scenes/features/life_tracker/components/player_panel/hold_repeat_button.tscn" id="2_hold_button"]
 
 [node name="CommanderDamageRow" type="HBoxContainer"]
-custom_minimum_size = Vector2(0, 60)
+custom_minimum_size = Vector2(0, 52)
 size_flags_horizontal = 0
 mouse_filter = 2
 theme_override_constants/separation = 12
@@ -13,6 +13,7 @@ script = ExtResource("1_row")
 [node name="MinusButton" parent="." instance=ExtResource("2_hold_button")]
 layout_mode = 2
 custom_minimum_size = Vector2(52, 52)
+size_flags_vertical = 4
 focus_mode = 0
 tap_delta = -1
 hold_delta = 10
@@ -27,13 +28,13 @@ size_flags_horizontal = 4
 mouse_filter = 2
 horizontal_alignment = 1
 vertical_alignment = 1
-theme_override_colors/font_color = Color(1, 1, 1, 0.95)
 theme_override_font_sizes/font_size = 32
 text = "0"
 
 [node name="PlusButton" parent="." instance=ExtResource("2_hold_button")]
 layout_mode = 2
 custom_minimum_size = Vector2(52, 52)
+size_flags_vertical = 4
 focus_mode = 0
 tap_delta = 1
 hold_delta = 10

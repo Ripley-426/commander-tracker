@@ -82,10 +82,16 @@ func _draw() -> void:
 
 func _get_die_rect() -> Rect2:
 	var margin: float = 11.0 if is_compact else 15.0
+	var reserved_top: float = 26.0 if is_compact else 34.0
 	var reserved_bottom: float = 50.0 if is_compact else 66.0
+	var available_width: float = max(size.x - margin * 2.0, 24.0)
+	var available_height: float = max(size.y - reserved_top - reserved_bottom - margin, 24.0)
+	var die_side: float = min(available_width, available_height)
+	var die_x: float = margin + (available_width - die_side) * 0.5
+	var die_y: float = margin + reserved_top + (available_height - die_side) * 0.5
 	return Rect2(
-		Vector2(margin, margin),
-		Vector2(max(size.x - margin * 2.0, 24.0), max(size.y - reserved_bottom - margin, 24.0))
+		Vector2(die_x, die_y),
+		Vector2(die_side, die_side)
 	)
 
 func _get_pip_positions(die_rect: Rect2, value: int) -> Array[Vector2]:

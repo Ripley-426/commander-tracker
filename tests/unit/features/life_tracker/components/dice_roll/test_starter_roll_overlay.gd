@@ -87,6 +87,19 @@ func test_background_tap_closes_after_winner_exists() -> void:
 	dim_layer.gui_input.emit(click_event)
 	assert_false(overlay.visible)
 
+func test_main_panel_tap_closes_after_winner_exists() -> void:
+	var overlay: Control = _create_overlay()
+	var forced_values: Array[int] = [1, 2, 3]
+	overlay.call("set_forced_roll_values", forced_values)
+	overlay.call("start_roll_for_players", _build_players(), false)
+	var main_panel: PanelContainer = overlay.get_node("MainPanel")
+
+	var click_event: InputEventMouseButton = InputEventMouseButton.new()
+	click_event.button_index = MOUSE_BUTTON_LEFT
+	click_event.pressed = true
+	main_panel.gui_input.emit(click_event)
+	assert_false(overlay.visible)
+
 func test_history_panel_width_expands_for_four_tied_dice() -> void:
 	var overlay: Control = _create_overlay()
 	var forced_values: Array[int] = [6, 6, 6, 6]
@@ -95,3 +108,21 @@ func test_history_panel_width_expands_for_four_tied_dice() -> void:
 
 	var history_panel: PanelContainer = overlay.get_node("HistoryPanel")
 	assert_true(history_panel.size.x >= 567.0)
+
+func test_history_panel_is_positioned_near_top_left_in_landscape() -> void:
+	var overlay: Control = _create_overlay()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	overlay.size = Vector2(1920.0, 1080.0)
+	overlay.call("_apply_portrait_rotation")
+	var history_panel: PanelContainer = overlay.get_node("HistoryPanel")
+	var rotated_top_left_y: float = history_panel.position.y + (history_panel.size.y * 0.5) - (history_panel.size.x * 0.5)
+	assert_true(rotated_top_left_y <= 20.0)
+
+func test_history_panel_is_positioned_near_bottom_left_in_portrait() -> void:
+	var overlay: Control = _create_overlay()
+	overlay.set_anchors_and_offsets_preset(Control.PRESET_TOP_LEFT)
+	overlay.size = Vector2(1080.0, 1920.0)
+	overlay.call("_apply_portrait_rotation")
+	var history_panel: PanelContainer = overlay.get_node("HistoryPanel")
+	var rotated_top_left_y: float = history_panel.position.y + (history_panel.size.y * 0.5) - (history_panel.size.x * 0.5)
+	assert_true(rotated_top_left_y >= 1400.0)

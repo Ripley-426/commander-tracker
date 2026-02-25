@@ -35,6 +35,7 @@ func _notification(what: int) -> void:
 	if what == NOTIFICATION_RESIZED:
 		if life_label == null or commander_damage_component == null:
 			return
+		_update_pivot_for_rotation()
 		_refresh_dynamic_text_size()
 		commander_damage_component.call("layout_for_panel_size", size)
 
@@ -122,7 +123,10 @@ func _apply_hit_zone_styles(hit_button: Button) -> void:
 	hit_button.add_theme_stylebox_override("focus", focus_style)
 
 func _apply_rotation(rotate_180: bool) -> void:
-	rotation_degrees = 180.0 if rotate_180 else 0.0
+	set_rotation_degrees_custom(180.0 if rotate_180 else 0.0)
+
+func set_rotation_degrees_custom(degrees: float) -> void:
+	rotation_degrees = degrees
 	call_deferred("_update_pivot_for_rotation")
 
 func _update_pivot_for_rotation() -> void:

@@ -23,3 +23,8 @@ func test_die_view_pivot_offset_is_centered() -> void:
 	var die_view: Control = _create_die_view()
 	await get_tree().process_frame
 	assert_eq(die_view.pivot_offset, die_view.size * 0.5)
+
+func test_die_rect_is_square() -> void:
+	var die_view: Control = _create_die_view()
+	var die_rect: Rect2 = die_view.call("_get_die_rect")
+	assert_eq(die_rect.size.x, die_rect.size.y)

@@ -2,9 +2,9 @@ extends Control
 
 const PERSISTENCE_STORE_SCRIPT: GDScript = preload("res://scripts/data/persistence_store.gd")
 
-@onready var continue_button: Button = $CenterContainer/VBoxContainer/ContinueButton
-@onready var new_game_button: Button = $CenterContainer/VBoxContainer/NewGameButton
-@onready var exit_button: Button = $CenterContainer/VBoxContainer/ExitButton
+@onready var continue_button: Button = $CenterContainer/MarginContainer/VBoxContainer/ContinueButton
+@onready var new_game_button: Button = $CenterContainer/MarginContainer/VBoxContainer/NewGameButton
+@onready var exit_button: Button = $CenterContainer/MarginContainer/VBoxContainer/ExitButton
 
 var store: RefCounted = PERSISTENCE_STORE_SCRIPT.new()
 var on_open_life_tracker: Callable = Callable()

@@ -20,7 +20,7 @@ func test_refresh_buttons_hides_continue_without_active_game() -> void:
 	menu.store = FakeStore.new(false)
 	menu._refresh_buttons()
 
-	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
+	var continue_button: Button = menu.get_node("CenterContainer/MarginContainer/VBoxContainer/ContinueButton")
 	assert_false(continue_button.visible)
 
 func test_refresh_buttons_disables_continue_without_active_game() -> void:
@@ -28,7 +28,7 @@ func test_refresh_buttons_disables_continue_without_active_game() -> void:
 	menu.store = FakeStore.new(false)
 	menu._refresh_buttons()
 
-	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
+	var continue_button: Button = menu.get_node("CenterContainer/MarginContainer/VBoxContainer/ContinueButton")
 	assert_true(continue_button.disabled)
 
 func test_refresh_buttons_shows_continue_with_active_game() -> void:
@@ -36,7 +36,7 @@ func test_refresh_buttons_shows_continue_with_active_game() -> void:
 	menu.store = FakeStore.new(true)
 	menu._refresh_buttons()
 
-	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
+	var continue_button: Button = menu.get_node("CenterContainer/MarginContainer/VBoxContainer/ContinueButton")
 	assert_true(continue_button.visible)
 
 func test_refresh_buttons_enables_continue_with_active_game() -> void:
@@ -44,5 +44,5 @@ func test_refresh_buttons_enables_continue_with_active_game() -> void:
 	menu.store = FakeStore.new(true)
 	menu._refresh_buttons()
 
-	var continue_button: Button = menu.get_node("CenterContainer/VBoxContainer/ContinueButton")
+	var continue_button: Button = menu.get_node("CenterContainer/MarginContainer/VBoxContainer/ContinueButton")
 	assert_false(continue_button.disabled)

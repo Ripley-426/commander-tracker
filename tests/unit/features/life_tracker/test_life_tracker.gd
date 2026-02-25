@@ -98,21 +98,21 @@ func test_first_panel_is_rotated_180_degrees_in_four_player_layout() -> void:
 	var tracker: Control = _create_tracker(state)
 	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
 	var panel_1: Control = board_container.get_child(0)
-	assert_eq(panel_1.rotation_degrees, 180.0)
+	assert_eq(panel_1.rotation_degrees, -90.0)
 
 func test_second_panel_is_rotated_180_degrees_in_four_player_layout() -> void:
 	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(4, 40, "p4_two_facing_two")
 	var tracker: Control = _create_tracker(state)
 	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
 	var panel_2: Control = board_container.get_child(1)
-	assert_eq(panel_2.rotation_degrees, 180.0)
+	assert_eq(panel_2.rotation_degrees, -90.0)
 
 func test_third_panel_is_not_rotated_in_four_player_layout() -> void:
 	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(4, 40, "p4_two_facing_two")
 	var tracker: Control = _create_tracker(state)
 	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
 	var panel_3: Control = board_container.get_child(2)
-	assert_eq(panel_3.rotation_degrees, 0.0)
+	assert_eq(panel_3.rotation_degrees, 90.0)
 
 func test_life_delta_keeps_same_panel_instance() -> void:
 	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
