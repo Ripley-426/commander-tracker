@@ -384,6 +384,45 @@ func test_commander_damage_value_is_preserved_through_dead_and_revive() -> void:
 	var damage_label: Label = row.get_node("DamageLabel")
 	assert_eq(damage_label.text, "6")
 
+func test_manual_dead_state_is_persisted_after_reload() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var context: Dictionary = _create_tracker_and_store(state)
+	var tracker: Control = context["tracker"]
+	var fake_store: FakeStore = context["store"]
+	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
+	var source_panel: Control = board_container.get_child(0)
+	var dead_button: Button = source_panel.get_node("DeadButton")
+	dead_button.pressed.emit()
+
+	var reloaded_tracker: Control = _create_tracker_from_store(fake_store)
+	var reloaded_board: Control = reloaded_tracker.get_node("VBoxContainer/BoardContainer")
+	var reloaded_source_panel: Control = reloaded_board.get_child(0)
+	var top_hit_button: Button = reloaded_source_panel.get_node("HitZones/TopHitButton")
+	assert_true(top_hit_button.disabled)
+
+func test_revived_at_lethal_state_is_persisted_after_reload() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	var players: Array = state.get("players", [])
+	var target_player: Dictionary = players[1]
+	var damage_map: Dictionary = target_player.get("commander_damage", {})
+	damage_map["p1"] = 21
+	target_player["commander_damage"] = damage_map
+	players[1] = target_player
+	state["players"] = players
+	var context: Dictionary = _create_tracker_and_store(state)
+	var tracker: Control = context["tracker"]
+	var fake_store: FakeStore = context["store"]
+	var board_container: Control = tracker.get_node("VBoxContainer/BoardContainer")
+	var target_panel: Control = board_container.get_child(1)
+	var dead_button: Button = target_panel.get_node("DeadButton")
+	dead_button.pressed.emit()
+
+	var reloaded_tracker: Control = _create_tracker_from_store(fake_store)
+	var reloaded_board: Control = reloaded_tracker.get_node("VBoxContainer/BoardContainer")
+	var reloaded_target_panel: Control = reloaded_board.get_child(1)
+	var top_hit_button: Button = reloaded_target_panel.get_node("HitZones/TopHitButton")
+	assert_false(top_hit_button.disabled)
+
 func test_commander_minus_does_not_set_negative_damage_in_state() -> void:
 	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
 	var tracker: Control = _create_tracker(state)

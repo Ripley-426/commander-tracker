@@ -1,6 +1,8 @@
 extends RefCounted
 
 const VERSION := 1
+const DEAD_PLAYER_INDICES_KEY: String = "dead_player_indices"
+const REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY: String = "revived_at_lethal_damage_indices"
 
 static func _is_int_like(value: Variant) -> bool:
 	if typeof(value) == TYPE_INT:
@@ -45,6 +47,8 @@ static func create_new_game(player_count: int, starting_life: int, layout_id: St
 		"in_progress": true,
 		"created_at_unix": now,
 		"updated_at_unix": now,
+		DEAD_PLAYER_INDICES_KEY: {},
+		REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY: {},
 		"settings": {
 			"player_count": player_count,
 			"starting_life": starting_life,
@@ -77,6 +81,10 @@ static func validate(data: Dictionary) -> bool:
 		return false
 	if players.size() != player_count:
 		return false
+	if not _validate_player_index_map(data.get(DEAD_PLAYER_INDICES_KEY, {}), player_count):
+		return false
+	if not _validate_player_index_map(data.get(REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY, {}), player_count):
+		return false
 
 	var ids: Array[String] = []
 	for player_value: Variant in players:
@@ -104,6 +112,21 @@ static func validate(data: Dictionary) -> bool:
 			if not _is_int_like(damage_value):
 				return false
 
+	return true
+
+static func _validate_player_index_map(value: Variant, player_count: int) -> bool:
+	if typeof(value) != TYPE_DICTIONARY:
+		return false
+	var map: Dictionary = value
+	for key_value: Variant in map.keys():
+		var key_text: String = str(key_value)
+		if not key_text.is_valid_int():
+			return false
+		var player_index: int = int(key_text)
+		if player_index < 0 or player_index >= player_count:
+			return false
+		if typeof(map.get(key_value)) != TYPE_BOOL:
+			return false
 	return true
 
 static func normalize_loaded_state(data: Dictionary) -> Dictionary:
@@ -135,4 +158,25 @@ static func normalize_loaded_state(data: Dictionary) -> Dictionary:
 		players[i] = player
 
 	normalized["players"] = players
+	var map_player_count: int = players.size()
+	normalized[DEAD_PLAYER_INDICES_KEY] = _normalize_player_index_map(normalized.get(DEAD_PLAYER_INDICES_KEY, {}), map_player_count)
+	normalized[REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY] = _normalize_player_index_map(normalized.get(REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY, {}), map_player_count)
+	return normalized
+
+static func _normalize_player_index_map(value: Variant, player_count: int) -> Dictionary:
+	if typeof(value) != TYPE_DICTIONARY:
+		return {}
+	var map: Dictionary = value
+	var normalized: Dictionary = {}
+	for key_value: Variant in map.keys():
+		var key_text: String = str(key_value)
+		if not key_text.is_valid_int():
+			continue
+		var player_index: int = int(key_text)
+		if player_index < 0 or player_index >= player_count:
+			continue
+		var flag_value: Variant = map.get(key_value, false)
+		if typeof(flag_value) != TYPE_BOOL:
+			continue
+		normalized[str(player_index)] = bool(flag_value)
 	return normalized

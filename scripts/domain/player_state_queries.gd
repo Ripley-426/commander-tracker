@@ -1,5 +1,7 @@
 extends RefCounted
 
+const FALLBACK_SOURCE_COLOR: Color = Color(0.75, 0.75, 0.75, 1.0)
+
 static func get_player_life(state: Dictionary, player_index: int) -> int:
 	var player: Dictionary = _get_player(state, player_index)
 	if player.is_empty():
@@ -43,11 +45,14 @@ static func build_commander_rows_for_target(state: Dictionary, target_player_ind
 			continue
 		var source: Dictionary = source_value
 		var source_id: String = str(source.get("id", ""))
+		var source_color: Color = FALLBACK_SOURCE_COLOR
+		if not player_colors.is_empty():
+			source_color = player_colors[source_player_index % player_colors.size()]
 		rows.append({
 			"source_index": source_player_index,
 			"source_name": str(source.get("name", "Player")),
 			"damage": int(damage_map.get(source_id, 0)),
-			"source_color": player_colors[source_player_index % player_colors.size()]
+			"source_color": source_color
 		})
 
 	return rows

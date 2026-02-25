@@ -61,3 +61,11 @@ func test_build_commander_rows_for_target_applies_source_colors() -> void:
 	var rows: Array[Dictionary] = PLAYER_STATE_QUERIES.build_commander_rows_for_target(state, 1, colors)
 	assert_eq(rows[0].get("source_color", Color()), colors[0])
 	assert_eq(rows[1].get("source_color", Color()), colors[2])
+
+func test_build_commander_rows_for_target_uses_fallback_color_when_palette_empty() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(3, 40, "p3_side_left")
+	var colors: Array[Color] = []
+	var rows: Array[Dictionary] = PLAYER_STATE_QUERIES.build_commander_rows_for_target(state, 1, colors)
+	assert_eq(rows.size(), 2)
+	assert_eq(rows[0].get("source_color", Color()), PLAYER_STATE_QUERIES.FALLBACK_SOURCE_COLOR)
+	assert_eq(rows[1].get("source_color", Color()), PLAYER_STATE_QUERIES.FALLBACK_SOURCE_COLOR)

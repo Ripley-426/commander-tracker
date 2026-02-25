@@ -92,6 +92,8 @@ func clear_commander_damage_from_source(state: Dictionary, source_index: int) ->
 
 	var changed: bool = false
 	for i: int in range(players.size()):
+		if i == source_index:
+			continue
 		var player_value: Variant = players[i]
 		if typeof(player_value) != TYPE_DICTIONARY:
 			continue
@@ -100,12 +102,12 @@ func clear_commander_damage_from_source(state: Dictionary, source_index: int) ->
 		if typeof(damage_value) != TYPE_DICTIONARY:
 			continue
 		var damage: Dictionary = damage_value
-		if not damage.has(source_id):
-			continue
-		damage.erase(source_id)
+		var current_damage: int = int(damage.get(source_id, 0))
+		if not damage.has(source_id) or current_damage != 0:
+			damage[source_id] = 0
+			changed = true
 		player["commander_damage"] = damage
 		players[i] = player
-		changed = true
 
 	if not changed:
 		return false

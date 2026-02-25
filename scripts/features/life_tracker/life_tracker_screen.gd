@@ -4,6 +4,8 @@ const PLAYER_PANEL_SCENE: PackedScene = preload("res://scenes/features/life_trac
 const PLAYER_STATE_QUERIES: GDScript = preload("res://scripts/domain/player_state_queries.gd")
 const PERSISTENCE_STORE_SCRIPT: GDScript = preload("res://scripts/data/persistence_store.gd")
 const STARTING_PLAYER_INDEX_KEY: String = "starting_player_index"
+const DEAD_PLAYER_INDICES_KEY: String = "dead_player_indices"
+const REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY: String = "revived_at_lethal_damage_indices"
 const PLAYER_COLORS: Array[Color] = [
 	Color(0.86, 0.26, 0.26, 1.0),
 	Color(0.22, 0.58, 0.92, 1.0),
@@ -43,6 +45,9 @@ func _ready() -> void:
 		_open_main_menu()
 		return
 	starting_player_index = _read_starting_player_index(game_state)
+	dead_player_indices = _read_player_index_map(game_state, DEAD_PLAYER_INDICES_KEY)
+	revived_at_lethal_damage_indices = _read_player_index_map(game_state, REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY)
+	_sync_runtime_maps_to_state()
 
 	_render_state()
 
@@ -128,8 +133,15 @@ func _on_commander_delta_pressed(target_player_index: int, source_player_index: 
 	var life_delta: int = next_life - previous_life
 	_refresh_player_commander_damage(target_player_index, source_player_index)
 	_refresh_player_life(target_player_index)
+	var runtime_map_changed: bool = false
 	if not _player_has_lethal_commander_damage(target_player_index):
-		revived_at_lethal_damage_indices.erase(str(target_player_index))
+		var target_key: String = str(target_player_index)
+		if revived_at_lethal_damage_indices.has(target_key):
+			revived_at_lethal_damage_indices.erase(target_key)
+			runtime_map_changed = true
+	if runtime_map_changed:
+		_sync_runtime_maps_to_state()
+		_commit_state()
 	if life_delta != 0:
 		_add_panel_life_feedback(target_player_index, life_delta)
 
@@ -151,14 +163,18 @@ func _on_player_dead_state_changed(player_index: int, is_dead: bool) -> void:
 	if is_dead:
 		revived_at_lethal_damage_indices.erase(key)
 		dead_player_indices[key] = true
+		_sync_runtime_maps_to_state()
 		_render_state()
+		_commit_state()
 		return
 	dead_player_indices.erase(key)
 	if _player_has_lethal_commander_damage(player_index):
 		revived_at_lethal_damage_indices[key] = true
 	else:
 		revived_at_lethal_damage_indices.erase(key)
+	_sync_runtime_maps_to_state()
 	_render_state()
+	_commit_state()
 
 func _add_panel_life_feedback(player_index: int, delta: int) -> void:
 	if player_index < 0 or player_index >= board_container.get_child_count():
@@ -234,6 +250,7 @@ func _filter_commander_rows_for_alive_sources(rows: Array[Dictionary]) -> Array[
 func _sync_dead_players_from_commander_damage() -> void:
 	var players: Array = game_state.get("players", [])
 	var detected_dead_by_damage: Dictionary = {}
+	var changed: bool = false
 	for i: int in range(players.size()):
 		var player_value: Variant = players[i]
 		if typeof(player_value) != TYPE_DICTIONARY:
@@ -256,6 +273,10 @@ func _sync_dead_players_from_commander_damage() -> void:
 		if dead_player_indices.has(dead_key):
 			continue
 		dead_player_indices[dead_key] = true
+		changed = true
+
+	if changed:
+		_sync_runtime_maps_to_state()
 
 func _player_has_lethal_commander_damage(player_index: int) -> bool:
 	var players: Array = game_state.get("players", [])
@@ -294,3 +315,32 @@ func _build_starter_roll_players() -> Array[Dictionary]:
 func _read_starting_player_index(state: Dictionary) -> int:
 	var value: Variant = state.get(STARTING_PLAYER_INDEX_KEY, -1)
 	return int(value)
+
+func _read_player_index_map(state: Dictionary, key: String) -> Dictionary:
+	var value: Variant = state.get(key, {})
+	if typeof(value) != TYPE_DICTIONARY:
+		return {}
+	var map: Dictionary = value
+	var normalized: Dictionary = {}
+	var players_value: Variant = state.get("players", [])
+	var players: Array = players_value if typeof(players_value) == TYPE_ARRAY else []
+	var player_count: int = players.size()
+	for index_value: Variant in map.keys():
+		var index_text: String = str(index_value)
+		if not index_text.is_valid_int():
+			continue
+		var player_index: int = int(index_text)
+		if player_index < 0 or player_index >= player_count:
+			continue
+		var flag_value: Variant = map.get(index_value, false)
+		if typeof(flag_value) != TYPE_BOOL:
+			continue
+		if bool(flag_value):
+			normalized[str(player_index)] = true
+	return normalized
+
+func _sync_runtime_maps_to_state() -> void:
+	if game_state.is_empty():
+		return
+	game_state[DEAD_PLAYER_INDICES_KEY] = dead_player_indices.duplicate(true)
+	game_state[REVIVED_AT_LETHAL_DAMAGE_INDICES_KEY] = revived_at_lethal_damage_indices.duplicate(true)

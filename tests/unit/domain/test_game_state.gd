@@ -33,6 +33,11 @@ func test_create_new_game_initializes_commander_damage_entries_for_other_players
 		var commander_damage: Dictionary = player["commander_damage"]
 		assert_eq(commander_damage.size(), 3)
 
+func test_create_new_game_initializes_runtime_dead_state_maps() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(4, 40, "p4_two_facing_two")
+	assert_eq(typeof(state.get("dead_player_indices", null)), TYPE_DICTIONARY)
+	assert_eq(typeof(state.get("revived_at_lethal_damage_indices", null)), TYPE_DICTIONARY)
+
 func test_validate_rejects_invalid_state() -> void:
 	var invalid_state: Dictionary = {
 		"version": 1,
@@ -46,3 +51,15 @@ func test_normalize_loaded_state_converts_starting_player_index_to_int() -> void
 	state["starting_player_index"] = 1.0
 	var normalized: Dictionary = GAME_STATE_SCRIPT.normalize_loaded_state(state)
 	assert_eq(typeof(normalized.get("starting_player_index", null)), TYPE_INT)
+
+func test_normalize_loaded_state_converts_runtime_dead_state_maps() -> void:
+	var state: Dictionary = GAME_STATE_SCRIPT.create_new_game(2, 40, "p2_head_to_head")
+	state["dead_player_indices"] = {"1": true, "bad": true}
+	state["revived_at_lethal_damage_indices"] = {"1": true, "-1": true}
+	var normalized: Dictionary = GAME_STATE_SCRIPT.normalize_loaded_state(state)
+	var dead_map: Dictionary = normalized.get("dead_player_indices", {})
+	var revived_map: Dictionary = normalized.get("revived_at_lethal_damage_indices", {})
+	assert_true(dead_map.has("1"))
+	assert_false(dead_map.has("bad"))
+	assert_true(revived_map.has("1"))
+	assert_false(revived_map.has("-1"))
